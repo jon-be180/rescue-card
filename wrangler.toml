@@ -1,0 +1,9 @@
+name = "rescue-card"
+type = "javascript"
+account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
+workers_dev = true
+route = "" # This will make your Worker handle all routes on your pages.dev subdomain
+
+[build]
+command = "npm install" # Install dependencies if you are using any (like handlebars)
+publish = "./"         # The directory to upload as static assets (can be "." if your worker handles everything)
