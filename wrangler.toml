@@ -1,6 +1,7 @@
 name = "rescue-card"
 account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
 workers_dev = true
+compatibility_date = "2025-04-16"
 
 [build]
 command = "npm install"
