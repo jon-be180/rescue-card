@@ -53,7 +53,7 @@ const generatorFormHTML = `
   <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Rescue Card Generator</title>
+      <title>Rescue Card Generator v1</title>
       <style>/* Your form CSS */</style>
   </head>
   <body>
