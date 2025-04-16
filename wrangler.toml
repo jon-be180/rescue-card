@@ -1,6 +1,5 @@
 name = "rescue-card"
 account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
-:qa
 workers_dev = true
 
 [[routes]]
