@@ -1,11 +1,5 @@
 import Handlebars from "handlebars"; // You'll need to install this via npm
 
-// Environment variables (set in Cloudflare Pages settings)
-const ACCOUNT_ID = env.ACCOUNT_ID;
-const R2_BUCKET_NAME = env.R2_BUCKET_NAME;
-const R2_ACCESS_KEY_ID = env.R2_ACCESS_KEY_ID;
-const R2_SECRET_ACCESS_KEY = env.R2_SECRET_ACCESS_KEY;
-
 // Initialize R2 client (you might need to adapt this based on a specific R2 library for Workers)
 // For now, we'll assume a direct fetch-based approach for simplicity.
 const r2 = {
@@ -86,6 +80,11 @@ const generatorFormHTML = `
 
 export default {
   async fetch(request, env) {
+    // Environment variables (set in Cloudflare Pages settings)
+    const R2_BUCKET_NAME = env.R2_BUCKET_NAME;
+    const R2_ACCESS_KEY_ID = env.R2_ACCESS_KEY_ID;
+    const R2_SECRET_ACCESS_KEY = env.R2_SECRET_ACCESS_KEY;
+
     const url = new URL(request.url);
 
     if (url.pathname === "/generator") {
