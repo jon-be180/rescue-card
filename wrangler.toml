@@ -1,5 +1,5 @@
 name = "rescue-card"
-account_id = "YOUR_CLOUDFLARE_ACCOUNT_ID"
+account_id = "046f5aadddfec2e200be18641d1105c6"
 workers_dev = true
 compatibility_date = "2025-04-16"
 main = "./src/index.js"
