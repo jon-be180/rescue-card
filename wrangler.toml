@@ -7,3 +7,7 @@ route = "" # This will make your Worker handle all routes on your pages.dev subd
 [build]
 command = "npm install" # Install dependencies if you are using any (like handlebars)
 publish = "./"         # The directory to upload as static assets (can be "." if your worker handles everything)
+
+[build.upload]
+format = "service-worker"
+main = "./src/index.js"
