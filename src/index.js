@@ -1,186 +1,7 @@
-import Handlebars from "handlebars";
-import crypto from "crypto";
+import Mustache from 'mustache';
+import crypto from 'crypto';
 
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-
-    if (url.pathname === "/generator") {
-      if (request.method === "GET") {
-        const generatorFormHTML = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Rescue Card Generator</title>
-              <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-          </head>
-          <body class="bg-gray-100 flex justify-center items-center min-h-screen">
-              <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-                  <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Rescue Card Generator</h1>
-                  <form id="generatorForm" method="POST" action="/generator">
-                      <div class="mb-4">
-                          <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-                          <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">Photo URL:</label>
-                          <input type="url" id="photo" name="photo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="markdownContent" class="block text-gray-700 text-sm font-bold mb-2">Markdown Content:</label>
-                          <textarea id="markdownContent" name="markdownContent" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
-                      </div>
-                      <div class="mb-4">
-                          <label for="pin" class="block text-gray-700 text-sm font-bold mb-2">PIN:</label>
-                          <input type="password" id="pin" name="pin" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="bloodType" class="block text-gray-700 text-sm font-bold mb-2">Blood Type:</label>
-                          <input type="text" id="bloodType" name="bloodType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="allergies" class="block text-gray-700 text-sm font-bold mb-2">Allergies:</label>
-                          <input type="text" id="allergies" name="allergies" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="medications" class="block text-gray-700 text-sm font-bold mb-2">Medications:</label>
-                          <input type="text" id="medications" name="medications" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="medicalConditions" class="block text-gray-700 text-sm font-bold mb-2">Medical Conditions:</label>
-                          <input type="text" id="medicalConditions" name="medicalConditions" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="emergencyContactName" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Name:</label>
-                          <input type="text" id="emergencyContactName" name="emergencyContactName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="emergencyContactPhone" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Phone:</label>
-                          <input type="text" id="emergencyContactPhone" name="emergencyContactPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <div class="mb-4">
-                          <label for="emergencyContactRelationship" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Relationship:</label>
-                          <input type="text" id="emergencyContactRelationship" name="emergencyContactRelationship" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Rescue Card</button>
-                  </form>
-              </div>
-          </body>
-          </html>
-        `;
-        return new Response(generatorFormHTML, {
-          headers: { "Content-Type": "text/html" },
-        });
-      } else if (request.method === "POST") {
-        const formData = await request.formData();
-        const name = formData.get("name");
-        const photo = formData.get("photo");
-        const markdownContent = formData.get("markdownContent");
-        const pin = formData.get("pin");
-        const bloodType = formData.get("bloodType");
-        const allergies = formData.get("allergies");
-        const medications = formData.get("medications");
-        const medicalConditions = formData.get("medicalConditions");
-        const emergencyContactName = formData.get("emergencyContactName");
-        const emergencyContactPhone = formData.get("emergencyContactPhone");
-        const emergencyContactRelationship = formData.get(
-          "emergencyContactRelationship",
-        );
-
-        const profileData = {
-          name,
-          photo,
-          markdownContent,
-          pin,
-          bloodType,
-          allergies,
-          medications,
-          medicalConditions,
-          emergencyContactName,
-          emergencyContactPhone,
-          emergencyContactRelationship,
-          creationTimestamp: new Date().toISOString(),
-          profileId: crypto
-            .createHash("sha256")
-            .update(JSON.stringify(formData))
-            .digest("hex"),
-        };
-        const html = cardTemplate(profileData);
-        const contentHash = crypto
-          .createHash("sha256")
-          .update(html)
-          .digest("hex");
-        const filename = `${contentHash}-${pin}.html`;
-
-        const r2 = env.R2.bind({
-          bucketName: env.R2_BUCKET_NAME,
-          accessKeyId: env.R2_ACCESS_KEY_ID,
-          secretAccessKey: env.R2_SECRET_ACCESS_KEY,
-        });
-        const r2Result = await r2.put(filename, html, {
-          contentType: "text/html",
-        });
-
-        if (r2Result.ok) {
-          return Response.redirect(`/card/${contentHash}?pin=${pin}`, 303);
-        } else {
-          return new Response("Error saving Rescue Card", { status: 500 });
-        }
-      }
-    } else if (url.pathname.startsWith("/card/")) {
-      const parts = url.pathname.split("/");
-      const contentHash = parts[2];
-      const pin = url.searchParams.get("pin");
-      const filename = `${contentHash}-${pin}.html`;
-
-      const r2 = env.R2.bind({
-        bucketName: env.R2_BUCKET_NAME,
-        accessKeyId: env.R2_ACCESS_KEY_ID,
-        secretAccessKey: env.R2_SECRET_ACCESS_KEY,
-      });
-      const r2Object = await r2.get(filename);
-
-      if (r2Object && r2Object.body) {
-        const htmlContent = await r2Object.body.text();
-        return new Response(htmlContent, {
-          headers: { "Content-Type": "text/html" },
-        });
-      } else {
-        return new Response("Rescue Card Not Found", { status: 404 });
-      }
-    } else if (url.pathname.startsWith("/generator/")) {
-      const profileId = url.pathname.split("/generator/")[2];
-      return new Response(
-        `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Update Rescue Card</title>
-            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-        </head>
-        <body class="bg-gray-100 flex justify-center items-center min-h-screen">
-            <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-                <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Update Rescue Card</h1>
-                <p>Update form for profile ID: ${profileId} (Functionality to be implemented)</p>
-                <a href="/" class="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Back to Generator</a>
-            </div>
-        </body>
-        </html>
-      `,
-        {
-          headers: { "Content-Type": "text/html" },
-        },
-      );
-    }
-
-    return new Response("Not Found", { status: 404 });
-  },
-};
-
+// Your template string
 const cardTemplateSource = `
   <!DOCTYPE html>
   <html lang="en">
@@ -193,9 +14,9 @@ const cardTemplateSource = `
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
           <h1 class="text-2xl font-bold mb-4 text-center text-red-600">{{name}}</h1>
-          {{#if photo}}
+          {{#photo}}
           <img src="{{photo}}" alt="Profile Photo" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
-          {{/if}}
+          {{/photo}}
           <div class="mb-4 border-t border-gray-200 pt-4">
               <h2 class="text-lg font-semibold mb-2 text-gray-800">Emergency Contact</h2>
               <p><strong class="font-semibold">Name:</strong> {{emergencyContactName}}</p>
@@ -221,4 +42,155 @@ const cardTemplateSource = `
   </body>
   </html>
 `;
-const cardTemplate = Handlebars.compile(cardTemplateSource);
+
+// Basic HTML for the generator form (you can expand on this)
+const generatorFormHTML = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Rescue Card Generator</title>
+      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body class="bg-gray-100 flex justify-center items-center min-h-screen">
+      <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+          <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Rescue Card Generator</h1>
+          <form id="generatorForm" method="POST" action="/generator">
+              <div class="mb-4">
+                  <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
+                  <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">Photo URL:</label>
+                  <input type="url" id="photo" name="photo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="markdownContent" class="block text-gray-700 text-sm font-bold mb-2">Markdown Content:</label>
+                  <textarea id="markdownContent" name="markdownContent" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+              </div>
+              <div class="mb-4">
+                  <label for="pin" class="block text-gray-700 text-sm font-bold mb-2">PIN:</label>
+                  <input type="password" id="pin" name="pin" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="bloodType" class="block text-gray-700 text-sm font-bold mb-2">Blood Type:</label>
+                  <input type="text" id="bloodType" name="bloodType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="allergies" class="block text-gray-700 text-sm font-bold mb-2">Allergies:</label>
+                  <input type="text" id="allergies" name="allergies" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="medications" class="block text-gray-700 text-sm font-bold mb-2">Medications:</label>
+                  <input type="text" id="medications" name="medications" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="medicalConditions" class="block text-gray-700 text-sm font-bold mb-2">Medical Conditions:</label>
+                  <input type="text" id="medicalConditions" name="medicalConditions" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="emergencyContactName" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Name:</label>
+                  <input type="text" id="emergencyContactName" name="emergencyContactName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="emergencyContactPhone" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Phone:</label>
+                  <input type="text" id="emergencyContactPhone" name="emergencyContactPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <div class="mb-4">
+                  <label for="emergencyContactRelationship" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Relationship:</label>
+                  <input type="text" id="emergencyContactRelationship" name="emergencyContactRelationship" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              </div>
+              <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Rescue Card</button>
+          </form>
+      </div>
+  </body>
+  </html>
+`;
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+
+    if (url.pathname === '/generator') {
+      if (request.method === 'GET') {
+        return new Response(generatorFormHTML, {
+          headers: { 'Content-Type': 'text/html' },
+        });
+      } else if (request.method === 'POST') {
+        const formData = await request.formData();
+        const name = formData.get('name');
+        const photo = formData.get('photo');
+        const markdownContent = formData.get('markdownContent');
+        const pin = formData.get('pin');
+        const bloodType = formData.get('bloodType');
+        const allergies = formData.get('allergies');
+        const medications = formData.get('medications');
+        const medicalConditions = formData.get('medicalConditions');
+        const emergencyContactName = formData.get('emergencyContactName');
+        const emergencyContactPhone = formData.get('emergencyContactPhone');
+        const emergencyContactRelationship = formData.get('emergencyContactRelationship');
+
+        const profileData = {
+          name, photo, markdownContent, pin, bloodType, allergies, medications, medicalConditions,
+          emergencyContactName, emergencyContactPhone, emergencyContactRelationship,
+          creationTimestamp: new Date().toISOString(),
+          profileId: crypto.createHash('sha256').update(JSON.stringify(formData)).digest('hex'),
+        };
+        const html = Mustache.render(cardTemplateSource, profileData);
+        const contentHash = crypto.createHash('sha256').update(html).digest('hex');
+        const filename = `${contentHash}-${pin}.html`;
+
+        const r2 = env.R2.bind({ bucketName: env.R2_BUCKET_NAME, accessKeyId: env.R2_ACCESS_KEY_ID, secretAccessKey: env.R2_SECRET_ACCESS_KEY });
+        const r2Result = await r2.put(filename, html, { contentType: 'text/html' });
+
+        if (r2Result.ok) {
+          return Response.redirect(`/card/${contentHash}?pin=${pin}`, 303);
+        } else {
+          return new Response('Error saving Rescue Card', { status: 500 });
+        }
+      }
+    } else if (url.pathname.startsWith('/card/')) {
+      const parts = url.pathname.split('/');
+      const contentHash = parts[2];
+      const pin = url.searchParams.get('pin');
+      const filename = `${contentHash}-${pin}.html`;
+
+      const r2 = env.R2.bind({ bucketName: env.R2_BUCKET_NAME, accessKeyId: env.R2_ACCESS_KEY_ID, secretAccessKey: env.R2_SECRET_ACCESS_KEY });
+      const r2Object = await r2.get(filename);
+
+      if (r2Object && r2Object.body) {
+        const htmlContent = await r2Object.body.text();
+        return new Response(htmlContent, {
+          headers: { 'Content-Type': 'text/html' },
+        });
+      } else {
+        return new Response('Rescue Card Not Found', { status: 404 });
+      }
+    } else if (url.pathname.startsWith('/generator/')) {
+      const profileId = url.pathname.split('/generator/')[2];
+      return new Response(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Update Rescue Card</title>
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        </head>
+        <body class="bg-gray-100 flex justify-center items-center min-h-screen">
+            <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+                <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Update Rescue Card</h1>
+                <p>Update form for profile ID: ${profileId} (Functionality to be implemented)</p>
+                <a href="/" class="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Back to Generator</a>
+            </div>
+        </body>
+        </html>
+      `, {
+        headers: { 'Content-Type': 'text/html' },
+      });
+    }
+
+    return new Response('Not Found', { status: 404 });
+  },
+};
