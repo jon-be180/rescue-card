@@ -36,7 +36,7 @@ const cardTemplateSource = `
           </div>
           <footer class="text-center text-gray-500 text-sm mt-4 border-t border-gray-200 pt-4">
               Created: {{creationTimestamp}}<br>
-              <a href="/generator/{{profileId}}" class="text-blue-500 hover:underline">Update Profile</a>
+              <a href="/{{profileId}}" class="text-blue-500 hover:underline">Update Profile</a>
           </footer>
       </div>
   </body>
@@ -56,7 +56,7 @@ const generatorFormHTML = `
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
           <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Rescue Card Generator</h1>
-          <form id="generatorForm" method="POST" action="/generator">
+          <form id="generatorForm" method="POST" action="/">
               <div class="mb-4">
                   <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
                   <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
@@ -112,7 +112,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.pathname === '/generator') {
+    if (url.pathname === '/') {
       if (request.method === 'GET') {
         return new Response(generatorFormHTML, {
           headers: { 'Content-Type': 'text/html' },
@@ -167,8 +167,8 @@ export default {
       } else {
         return new Response('Rescue Card Not Found', { status: 404 });
       }
-    } else if (url.pathname.startsWith('/generator/')) {
-      const profileId = url.pathname.split('/generator/')[2];
+    } else if (url.pathname.startsWith('/')) {
+      const profileId = url.pathname.split('/')[2];
       return new Response(`
         <!DOCTYPE html>
         <html lang="en">
