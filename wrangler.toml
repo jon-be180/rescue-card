@@ -11,3 +11,7 @@ command = "npm install"
 [observability]
 enabled = true
 head_sampling_rate = 1 # optional. default = 1.
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "rescue-card-storage"

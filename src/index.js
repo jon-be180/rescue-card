@@ -71,7 +71,7 @@ const generatorFormHTML = `
               </div>
               <div class="mb-4">
                   <label for="pin" class="block text-gray-700 text-sm font-bold mb-2">PIN:</label>
-                  <input type="password" id="pin" name="pin" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                  <input type="password" id="pin" name="pin" minlength="4" maxlength="4" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
               </div>
               <div class="mb-4">
                   <label for="bloodType" class="block text-gray-700 text-sm font-bold mb-2">Blood Type:</label>
