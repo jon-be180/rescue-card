@@ -1,94 +1,75 @@
-import Handlebars from "handlebars"; // You'll need to install this via npm
-
-// Initialize R2 client (you might need to adapt this based on a specific R2 library for Workers)
-// For now, we'll assume a direct fetch-based approach for simplicity.
-const r2 = {
-  put: async (key, value, options) => {
-    // Implement R2 PUT logic using fetch and the S3-compatible API
-    // You'll need to construct the correct headers and request body, including signing.
-    // This is a simplified placeholder.
-    console.log(`Simulating R2 PUT for key: ${key}`);
-    console.log(`Value: ${value}`);
-    return { ok: true }; // Replace with actual R2 interaction
-  },
-  get: async (key) => {
-    // Implement R2 GET logic using fetch and the S3-compatible API
-    // You'll need to construct the correct headers and handle the response.
-    // This is a simplified placeholder.
-    console.log(`Simulating R2 GET for key: ${key}`);
-    return { ok: false, body: null }; // Replace with actual R2 interaction
-  },
-};
-
-// Handlebars template (move your HTML template string here)
-const cardTemplateSource = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Rescue Card</title>
-      <style>/* Your CSS */</style>
-  </head>
-  <body>
-      <div class="card">
-          <h1>{{name}}</h1>
-          {{#if photo}}
-          <img src="{{photo}}" alt="Profile Photo">
-          {{/if}}
-          <div class="medical-section"><h2>Emergency Contact</h2><p><strong>Name:</strong> {{emergencyContactName}}</p><p><strong>Phone:</strong> {{emergencyContactPhone}}</p><p><strong>Relationship:</strong> {{emergencyContactRelationship}}</p></div>
-          <div class="medical-section"><h2>Medical Information</h2><p><strong>Blood Type:</strong> {{bloodType}}</p><p><strong>Allergies:</strong> {{allergies}}</p><p><strong>Medications:</strong> {{medications}}</p><p><strong>Medical Conditions:</strong> {{medicalConditions}}</p></div>
-          <pre>{{markdownContent}}</pre>
-          <footer>Created: {{creationTimestamp}}<br><a href="/generator/{{profileId}}">Update Profile</a></footer>
-      </div>
-  </body>
-  </html>
-`;
-const cardTemplate = Handlebars.compile(cardTemplateSource);
-
-// Basic HTML for the generator form (you can expand on this)
-const generatorFormHTML = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Rescue Card Generator v1</title>
-      <style>/* Your form CSS */</style>
-  </head>
-  <body>
-      <div class="card">
-          <h1>Rescue Card Generator</h1>
-          <form method="POST" action="/generator">
-              <label for="name">Name:</label><input type="text" id="name" name="name" required><br>
-              <label for="photo">Photo URL:</label><input type="url" id="photo" name="photo"><br>
-              <label for="markdownContent">Markdown Content:</label><textarea id="markdownContent" name="markdownContent" rows="5"></textarea><br>
-              <label for="pin">PIN:</label><input type="password" id="pin" name="pin" required><br>
-              <label for="bloodType">Blood Type:</label><input type="text" id="bloodType" name="bloodType"><br>
-              <label for="allergies">Allergies:</label><input type="text" id="allergies" name="allergies"><br>
-              <label for="medications">Medications:</label><input type="text" id="medications" name="medications"><br>
-              <label for="medicalConditions">Medical Conditions:</label><input type="text" id="medicalConditions" name="medicalConditions"><br>
-              <label for="emergencyContactName">Emergency Contact Name:</label><input type="text" id="emergencyContactName" name="emergencyContactName"><br>
-              <label for="emergencyContactPhone">Emergency Contact Phone:</label><input type="text" id="emergencyContactPhone" name="emergencyContactPhone"><br>
-              <label for="emergencyContactRelationship">Emergency Contact Relationship:</label><input type="text" id="emergencyContactRelationship" name="emergencyContactRelationship"><br>
-              <button type="submit">Generate Rescue Card</button>
-          </form>
-      </div>
-  </body>
-  </html>
-`;
+import Handlebars from "handlebars";
+import crypto from "crypto";
 
 export default {
   async fetch(request, env) {
-    // Environment variables (set in Cloudflare Pages settings)
-    const R2_BUCKET_NAME = env.R2_BUCKET_NAME;
-    const R2_ACCESS_KEY_ID = env.R2_ACCESS_KEY_ID;
-    const R2_SECRET_ACCESS_KEY = env.R2_SECRET_ACCESS_KEY;
-
     const url = new URL(request.url);
 
     if (url.pathname === "/generator") {
       if (request.method === "GET") {
+        const generatorFormHTML = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Rescue Card Generator</title>
+              <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+          </head>
+          <body class="bg-gray-100 flex justify-center items-center min-h-screen">
+              <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+                  <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Rescue Card Generator</h1>
+                  <form id="generatorForm" method="POST" action="/generator">
+                      <div class="mb-4">
+                          <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
+                          <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">Photo URL:</label>
+                          <input type="url" id="photo" name="photo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="markdownContent" class="block text-gray-700 text-sm font-bold mb-2">Markdown Content:</label>
+                          <textarea id="markdownContent" name="markdownContent" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                      </div>
+                      <div class="mb-4">
+                          <label for="pin" class="block text-gray-700 text-sm font-bold mb-2">PIN:</label>
+                          <input type="password" id="pin" name="pin" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="bloodType" class="block text-gray-700 text-sm font-bold mb-2">Blood Type:</label>
+                          <input type="text" id="bloodType" name="bloodType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="allergies" class="block text-gray-700 text-sm font-bold mb-2">Allergies:</label>
+                          <input type="text" id="allergies" name="allergies" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="medications" class="block text-gray-700 text-sm font-bold mb-2">Medications:</label>
+                          <input type="text" id="medications" name="medications" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="medicalConditions" class="block text-gray-700 text-sm font-bold mb-2">Medical Conditions:</label>
+                          <input type="text" id="medicalConditions" name="medicalConditions" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="emergencyContactName" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Name:</label>
+                          <input type="text" id="emergencyContactName" name="emergencyContactName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="emergencyContactPhone" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Phone:</label>
+                          <input type="text" id="emergencyContactPhone" name="emergencyContactPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <div class="mb-4">
+                          <label for="emergencyContactRelationship" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Relationship:</label>
+                          <input type="text" id="emergencyContactRelationship" name="emergencyContactRelationship" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Rescue Card</button>
+                  </form>
+              </div>
+          </body>
+          </html>
+        `;
         return new Response(generatorFormHTML, {
           headers: { "Content-Type": "text/html" },
         });
@@ -124,7 +105,7 @@ export default {
           profileId: crypto
             .createHash("sha256")
             .update(JSON.stringify(formData))
-            .digest("hex"), // Simplified profile ID
+            .digest("hex"),
         };
         const html = cardTemplate(profileData);
         const contentHash = crypto
@@ -133,9 +114,15 @@ export default {
           .digest("hex");
         const filename = `${contentHash}-${pin}.html`;
 
+        const r2 = env.R2.bind({
+          bucketName: env.R2_BUCKET_NAME,
+          accessKeyId: env.R2_ACCESS_KEY_ID,
+          secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+        });
         const r2Result = await r2.put(filename, html, {
           contentType: "text/html",
         });
+
         if (r2Result.ok) {
           return Response.redirect(`/card/${contentHash}?pin=${pin}`, 303);
         } else {
@@ -147,6 +134,12 @@ export default {
       const contentHash = parts[2];
       const pin = url.searchParams.get("pin");
       const filename = `${contentHash}-${pin}.html`;
+
+      const r2 = env.R2.bind({
+        bucketName: env.R2_BUCKET_NAME,
+        accessKeyId: env.R2_ACCESS_KEY_ID,
+        secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+      });
       const r2Object = await r2.get(filename);
 
       if (r2Object && r2Object.body) {
@@ -158,18 +151,74 @@ export default {
         return new Response("Rescue Card Not Found", { status: 404 });
       }
     } else if (url.pathname.startsWith("/generator/")) {
-      // Logic for the update form
       const profileId = url.pathname.split("/generator/")[2];
-      // You'll need to fetch the data from R2 based on the profileId and populate the form
       return new Response(
-        `<h1>Update Form for ${profileId} (To be implemented)</h1>`,
+        `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Update Rescue Card</title>
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        </head>
+        <body class="bg-gray-100 flex justify-center items-center min-h-screen">
+            <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+                <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Update Rescue Card</h1>
+                <p>Update form for profile ID: ${profileId} (Functionality to be implemented)</p>
+                <a href="/" class="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Back to Generator</a>
+            </div>
+        </body>
+        </html>
+      `,
         {
           headers: { "Content-Type": "text/html" },
         },
       );
     }
 
-    // Default response for other paths
     return new Response("Not Found", { status: 404 });
   },
 };
+
+const cardTemplateSource = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Rescue Card</title>
+      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body class="bg-gray-100 flex justify-center items-center min-h-screen">
+      <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+          <h1 class="text-2xl font-bold mb-4 text-center text-red-600">{{name}}</h1>
+          {{#if photo}}
+          <img src="{{photo}}" alt="Profile Photo" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
+          {{/if}}
+          <div class="mb-4 border-t border-gray-200 pt-4">
+              <h2 class="text-lg font-semibold mb-2 text-gray-800">Emergency Contact</h2>
+              <p><strong class="font-semibold">Name:</strong> {{emergencyContactName}}</p>
+              <p><strong class="font-semibold">Phone:</strong> {{emergencyContactPhone}}</p>
+              <p><strong class="font-semibold">Relationship:</strong> {{emergencyContactRelationship}}</p>
+          </div>
+          <div class="mb-4 border-t border-gray-200 pt-4">
+              <h2 class="text-lg font-semibold mb-2 text-gray-800">Medical Information</h2>
+              <p><strong class="font-semibold">Blood Type:</strong> {{bloodType}}</p>
+              <p><strong class="font-semibold">Allergies:</strong> {{allergies}}</p>
+              <p><strong class="font-semibold">Medications:</strong> {{medications}}</p>
+              <p><strong class="font-semibold">Medical Conditions:</strong> {{medicalConditions}}</p>
+          </div>
+          <div class="mb-4 border-t border-gray-200 pt-4">
+              <h2 class="text-lg font-semibold mb-2 text-gray-800">Additional Information</h2>
+              <pre class="whitespace-pre-wrap text-sm text-gray-700">{{markdownContent}}</pre>
+          </div>
+          <footer class="text-center text-gray-500 text-sm mt-4 border-t border-gray-200 pt-4">
+              Created: {{creationTimestamp}}<br>
+              <a href="/generator/{{profileId}}" class="text-blue-500 hover:underline">Update Profile</a>
+          </footer>
+      </div>
+  </body>
+  </html>
+`;
+const cardTemplate = Handlebars.compile(cardTemplateSource);
