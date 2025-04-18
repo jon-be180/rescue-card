@@ -158,14 +158,14 @@ export default {
           .digest("hex");
         const filename = `${contentHash}-${pin}.html`;
 
-        const r2Result = await env.R2.put(filename, html, {
-          contentType: "text/html",
-        });
-
-        if (r2Result.ok) {
+        try {
+          const r2Result = await env.R2.put(filename, html, {
+            contentType: "text/html",
+          });
+          console.log("R2 Put Result (Success):", JSON.stringify(r2Result)); // Log success
           return Response.redirect(`/card/${contentHash}?pin=${pin}`, 303);
-        } else {
-          console.error("Error saving to R2:", JSON.stringify(r2Result)); // Log the entire result object
+        } catch (error) {
+          console.error("Error saving to R2:", error); // Log the error object if put fails
           return new Response("Error saving Rescue Card", { status: 500 });
         }
       }
