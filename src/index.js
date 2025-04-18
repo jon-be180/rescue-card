@@ -165,6 +165,7 @@ export default {
         if (r2Result.ok) {
           return Response.redirect(`/card/${contentHash}?pin=${pin}`, 303);
         } else {
+          console.error("Error saving to R2:", r2Result); // Log the entire result object
           return new Response("Error saving Rescue Card", { status: 500 });
         }
       }
