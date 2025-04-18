@@ -1,5 +1,5 @@
-import Mustache from 'mustache';
-import crypto from 'crypto';
+import Mustache from "mustache";
+import crypto from "crypto";
 
 // Your template string
 const cardTemplateSource = `
@@ -112,64 +112,81 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.pathname === '/') {
-      if (request.method === 'GET') {
+    if (url.pathname === "/") {
+      if (request.method === "GET") {
         return new Response(generatorFormHTML, {
-          headers: { 'Content-Type': 'text/html' },
+          headers: { "Content-Type": "text/html" },
         });
-      } else if (request.method === 'POST') {
+      } else if (request.method === "POST") {
         const formData = await request.formData();
-        const name = formData.get('name');
-        const photo = formData.get('photo');
-        const markdownContent = formData.get('markdownContent');
-        const pin = formData.get('pin');
-        const bloodType = formData.get('bloodType');
-        const allergies = formData.get('allergies');
-        const medications = formData.get('medications');
-        const medicalConditions = formData.get('medicalConditions');
-        const emergencyContactName = formData.get('emergencyContactName');
-        const emergencyContactPhone = formData.get('emergencyContactPhone');
-        const emergencyContactRelationship = formData.get('emergencyContactRelationship');
+        const name = formData.get("name");
+        const photo = formData.get("photo");
+        const markdownContent = formData.get("markdownContent");
+        const pin = formData.get("pin");
+        const bloodType = formData.get("bloodType");
+        const allergies = formData.get("allergies");
+        const medications = formData.get("medications");
+        const medicalConditions = formData.get("medicalConditions");
+        const emergencyContactName = formData.get("emergencyContactName");
+        const emergencyContactPhone = formData.get("emergencyContactPhone");
+        const emergencyContactRelationship = formData.get(
+          "emergencyContactRelationship",
+        );
 
         const profileData = {
-          name, photo, markdownContent, pin, bloodType, allergies, medications, medicalConditions,
-          emergencyContactName, emergencyContactPhone, emergencyContactRelationship,
+          name,
+          photo,
+          markdownContent,
+          pin,
+          bloodType,
+          allergies,
+          medications,
+          medicalConditions,
+          emergencyContactName,
+          emergencyContactPhone,
+          emergencyContactRelationship,
           creationTimestamp: new Date().toISOString(),
-          profileId: crypto.createHash('sha256').update(JSON.stringify(formData)).digest('hex'),
+          profileId: crypto
+            .createHash("sha256")
+            .update(JSON.stringify(formData))
+            .digest("hex"),
         };
         const html = Mustache.render(cardTemplateSource, profileData);
-        const contentHash = crypto.createHash('sha256').update(html).digest('hex');
+        const contentHash = crypto
+          .createHash("sha256")
+          .update(html)
+          .digest("hex");
         const filename = `${contentHash}-${pin}.html`;
 
-        const r2 = env.R2.bind({ bucketName: env.R2_BUCKET_NAME, accessKeyId: env.R2_ACCESS_KEY_ID, secretAccessKey: env.R2_SECRET_ACCESS_KEY });
-        const r2Result = await r2.put(filename, html, { contentType: 'text/html' });
+        const r2Result = await env.R2.put(filename, html, {
+          contentType: "text/html",
+        });
 
         if (r2Result.ok) {
           return Response.redirect(`/card/${contentHash}?pin=${pin}`, 303);
         } else {
-          return new Response('Error saving Rescue Card', { status: 500 });
+          return new Response("Error saving Rescue Card", { status: 500 });
         }
       }
-    } else if (url.pathname.startsWith('/card/')) {
-      const parts = url.pathname.split('/');
+    } else if (url.pathname.startsWith("/card/")) {
+      const parts = url.pathname.split("/");
       const contentHash = parts[2];
-      const pin = url.searchParams.get('pin');
+      const pin = url.searchParams.get("pin");
       const filename = `${contentHash}-${pin}.html`;
-
-      const r2 = env.R2.bind({ bucketName: env.R2_BUCKET_NAME, accessKeyId: env.R2_ACCESS_KEY_ID, secretAccessKey: env.R2_SECRET_ACCESS_KEY });
-      const r2Object = await r2.get(filename);
+      const r2Object = await env.R2.get(filename);
 
       if (r2Object && r2Object.body) {
         const htmlContent = await r2Object.body.text();
         return new Response(htmlContent, {
-          headers: { 'Content-Type': 'text/html' },
+          headers: { "Content-Type": "text/html" },
         });
       } else {
-        return new Response('Rescue Card Not Found', { status: 404 });
+        return new Response("Rescue Card Not Found", { status: 404 });
       }
-    } else if (url.pathname.startsWith('/')) {
-      const profileId = url.pathname.split('/')[2];
-      return new Response(`
+    } else if (url.pathname.startsWith("/")) {
+      const profileId = url.pathname.split("/")[2];
+      return new Response(
+        `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -186,11 +203,13 @@ export default {
             </div>
         </body>
         </html>
-      `, {
-        headers: { 'Content-Type': 'text/html' },
-      });
+      `,
+        {
+          headers: { "Content-Type": "text/html" },
+        },
+      );
     }
 
-    return new Response('Not Found', { status: 404 });
+    return new Response("Not Found", { status: 404 });
   },
 };
