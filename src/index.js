@@ -164,16 +164,17 @@ export default {
         let photoContentType = null;
 
         if (photoFile instanceof File && photoFile.size > 0) {
-          console.log("photoFile is a File");
-          const arrayBuffer = await photoFile.arrayBuffer();
-          console.log("photoFile is a awaited");
-          const base64 = btoa(
-            String.fromCharCode(...new Uint8Array(arrayBuffer)),
-          );
-          console.log("base64 exists");
-          photoBase64 = base64;
-          photoContentType = photoFile.type;
+          try {
+            const arrayBuffer = await photoFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const base64 = buffer.toString("base64");
+            photoBase64 = base64;
+            photoContentType = photoFile.type;
+          } catch (error) {
+            console.error("Error during image processing:", error);
+          }
         }
+
         console.log("photo variables setup");
 
         const profileData = {
