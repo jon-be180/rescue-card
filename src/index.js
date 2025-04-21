@@ -182,7 +182,7 @@ export default {
       if (r2Object && r2Object.body) {
         console.log("Retrieved R2 Object:", r2Object);
         console.log("Retrieved R2 Object Body:", r2Object.body);
-        const htmlContent = await r2Object.body.text();
+        const htmlContent = await new Response(r2Object.body).text();
         return new Response(htmlContent, {
           headers: { "Content-Type": "text/html" },
         });
