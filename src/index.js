@@ -219,7 +219,7 @@ export default {
       if (!pin) {
         // Serve a PIN entry form
         const cardPinHtml = Mustache.render(cardPinTemplateSource, {
-          contentHash: contentHash,
+          contentHash,
         });
         return new Response(cardPinHtml, {
           headers: { "Content-Type": "text/html" },
