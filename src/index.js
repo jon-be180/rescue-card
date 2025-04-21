@@ -163,7 +163,10 @@ export default {
             contentType: "text/html",
           });
           console.log("R2 Put Result (Success):", JSON.stringify(r2Result)); // Log success
-          return Response.redirect(`/card/${contentHash}?pin=${pin}`, 303);
+          return Response.redirect(
+            `${url.origin}/card/${contentHash}?pin=${pin}`,
+            303,
+          );
         } catch (error) {
           console.error("Error saving to R2:", error); // Log the error object if put fails
           return new Response("Error saving Rescue Card", { status: 500 });
