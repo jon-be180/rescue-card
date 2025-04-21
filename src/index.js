@@ -188,6 +188,7 @@ export default {
             .update(JSON.stringify(formData))
             .digest("hex"),
         };
+        console.log("191 mustache"); // Log success
         const html = Mustache.render(cardTemplateSource, profileData);
         const contentHash = crypto
           .createHash("sha256")
@@ -195,6 +196,7 @@ export default {
           .digest("hex");
         const filename = `${contentHash}-${pin}.html`;
 
+        console.log("199 mustache worked"); // Log success
         try {
           const r2Result = await env.R2.put(filename, html, {
             contentType: "text/html",
