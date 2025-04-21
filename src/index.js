@@ -164,10 +164,13 @@ export default {
         let photoContentType = null;
 
         if (photoFile instanceof File && photoFile.size > 0) {
+          console.log("photoFile is a File");
           const arrayBuffer = await photoFile.arrayBuffer();
+          console.log("photoFile is a awaited");
           const base64 = btoa(
             String.fromCharCode(...new Uint8Array(arrayBuffer)),
           );
+          console.log("base64 exists");
           photoBase64 = base64;
           photoContentType = photoFile.type;
         }
