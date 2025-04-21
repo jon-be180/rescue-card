@@ -14,9 +14,9 @@ const cardTemplateSource = `
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
           <h1 class="text-2xl font-bold mb-4 text-center text-red-600">{{name}}</h1>
-          {{#photo}}
-          <img src="{{photo}}" alt="Profile Photo" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
-          {{/photo}}
+          {{#if photo}}
+          <img src="data:{{photoContentType}};base64,{{photo}}" alt="Profile Photo" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
+          {{/if}}
           <div class="mb-4 border-t border-gray-200 pt-4">
               <h2 class="text-lg font-semibold mb-2 text-gray-800">Emergency Contact</h2>
               <p><strong class="font-semibold">Name:</strong> {{emergencyContactName}}</p>
@@ -43,6 +43,31 @@ const cardTemplateSource = `
   </html>
 `;
 
+const cardPinTemplateSource = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Enter PIN</title>
+              <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+          </head>
+          <body class="bg-gray-100 flex justify-center items-center min-h-screen">
+              <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+                  <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Enter PIN</h1>
+                  <form method="GET" action="/card/${contentHash}">
+                      <div class="mb-4">
+                          <label for="pin" class="block text-gray-700 text-sm font-bold mb-2">PIN:</label>
+                          <input type="password" id="pin" name="pin" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                      </div>
+                      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">View Card</button>
+                  </form>
+                  <p class="mt-4 text-gray-600 text-sm">If you've lost your PIN, please contact the card creator.</p>
+              </div>
+          </body>
+          </html>
+        `;
+
 // Basic HTML for the generator form (you can expand on this)
 const generatorFormHTML = `
   <!DOCTYPE html>
@@ -56,14 +81,14 @@ const generatorFormHTML = `
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
           <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Rescue Card Generator</h1>
-          <form id="generatorForm" method="POST" action="/">
+          <form id="generatorForm" method="POST" action="/" enctype="multipart/form-data">
               <div class="mb-4">
                   <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
                   <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
               </div>
               <div class="mb-4">
-                  <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">Photo URL:</label>
-                  <input type="url" id="photo" name="photo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                  <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">Profile Photo:</label>
+                  <input type="file" id="photo" name="photo" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
               </div>
               <div class="mb-4">
                   <label for="markdownContent" class="block text-gray-700 text-sm font-bold mb-2">Markdown Content:</label>
@@ -120,7 +145,7 @@ export default {
       } else if (request.method === "POST") {
         const formData = await request.formData();
         const name = formData.get("name");
-        const photo = formData.get("photo");
+        const photoFile = formData.get("photo"); // Get the File object
         const markdownContent = formData.get("markdownContent");
         const pin = formData.get("pin");
         const bloodType = formData.get("bloodType");
@@ -133,9 +158,21 @@ export default {
           "emergencyContactRelationship",
         );
 
+        let photoBase64 = null;
+        let photoContentType = null;
+
+        if (photoFile instanceof File && photoFile.size > 0) {
+          const arrayBuffer = await photoFile.arrayBuffer();
+          const base64 = btoa(
+            String.fromCharCode(...new Uint8Array(arrayBuffer)),
+          );
+          photoBase64 = base64;
+          photoContentType = photoFile.type;
+        }
+
         const profileData = {
           name,
-          photo,
+          photo: photoBase64,
           markdownContent,
           pin,
           bloodType,
@@ -179,15 +216,20 @@ export default {
       const filename = `${contentHash}-${pin}.html`;
       const r2Object = await env.R2.get(filename);
 
-      if (r2Object && r2Object.body) {
-        console.log("Retrieved R2 Object:", r2Object);
-        console.log("Retrieved R2 Object Body:", r2Object.body);
-        const htmlContent = await new Response(r2Object.body).text();
-        return new Response(htmlContent, {
+      if (!pin) {
+        // Serve a PIN entry form
+        return new Response(cardPinTemplateSource, {
           headers: { "Content-Type": "text/html" },
         });
       } else {
-        return new Response("Rescue Card Not Found", { status: 404 });
+        if (r2Object && r2Object.body) {
+          const htmlContent = await new Response(r2Object.body).text();
+          return new Response(htmlContent, {
+            headers: { "Content-Type": "text/html" },
+          });
+        } else {
+          return new Response("Rescue Card Not Found", { status: 404 });
+        }
       }
     } else if (url.pathname.startsWith("/")) {
       const profileId = url.pathname.split("/")[2];
