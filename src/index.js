@@ -55,7 +55,7 @@ const cardPinTemplateSource = `
           <body class="bg-gray-100 flex justify-center items-center min-h-screen">
               <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
                   <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Enter PIN</h1>
-                  <form method="GET" action="/card/${contentHash}">
+                  <form method="GET" action="/card/{{contentHash}}">
                       <div class="mb-4">
                           <label for="pin" class="block text-gray-700 text-sm font-bold mb-2">PIN:</label>
                           <input type="password" id="pin" name="pin" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
@@ -218,7 +218,10 @@ export default {
 
       if (!pin) {
         // Serve a PIN entry form
-        return new Response(cardPinTemplateSource, {
+        const cardPinHtml = Mustache.render(cardPinTemplateSource, {
+          contentHash: contentHash,
+        });
+        return new Response(cardPinHtml, {
           headers: { "Content-Type": "text/html" },
         });
       } else {
