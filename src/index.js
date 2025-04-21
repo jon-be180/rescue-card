@@ -14,9 +14,7 @@ const cardTemplateSource = `
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
           <h1 class="text-2xl font-bold mb-4 text-center text-red-600">{{name}}</h1>
-          {{#if photo}}
           <img src="data:{{photoContentType}};base64,{{photo}}" alt="Profile Photo" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
-          {{/if}}
           <div class="mb-4 border-t border-gray-200 pt-4">
               <h2 class="text-lg font-semibold mb-2 text-gray-800">Emergency Contact</h2>
               <p><strong class="font-semibold">Name:</strong> {{emergencyContactName}}</p>
