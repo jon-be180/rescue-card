@@ -143,6 +143,7 @@ export default {
           headers: { "Content-Type": "text/html" },
         });
       } else if (request.method === "POST") {
+        console.log("post started"); // Log success
         const formData = await request.formData();
         const name = formData.get("name");
         const photoFile = formData.get("photo"); // Get the File object
@@ -157,6 +158,7 @@ export default {
         const emergencyContactRelationship = formData.get(
           "emergencyContactRelationship",
         );
+        console.log("const setup");
 
         let photoBase64 = null;
         let photoContentType = null;
@@ -169,6 +171,7 @@ export default {
           photoBase64 = base64;
           photoContentType = photoFile.type;
         }
+        console.log("photo variables setup");
 
         const profileData = {
           name,
@@ -188,7 +191,7 @@ export default {
             .update(JSON.stringify(formData))
             .digest("hex"),
         };
-        console.log("191 mustache"); // Log success
+        console.log("pre mustache"); // Log success
         const html = Mustache.render(cardTemplateSource, profileData);
         const contentHash = crypto
           .createHash("sha256")
@@ -196,7 +199,7 @@ export default {
           .digest("hex");
         const filename = `${contentHash}-${pin}.html`;
 
-        console.log("199 mustache worked"); // Log success
+        console.log("post mustache worked"); // Log success
         try {
           const r2Result = await env.R2.put(filename, html, {
             contentType: "text/html",
