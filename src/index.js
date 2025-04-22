@@ -191,7 +191,7 @@ export default {
           .createHash("sha256")
           .update(html)
           .digest("hex");
- 
+
         const profileData = {
           name,
           photo: photoBase64,
@@ -209,11 +209,11 @@ export default {
             .createHash("sha256")
             .update(JSON.stringify(formData))
             .digest("hex"),
-          contentHash: contentHash
+          contentHash: contentHash,
         };
         console.log("pre mustache"); // Log success
         const html = Mustache.render(cardTemplateSource, profileData);
-k       const filename = `${contentHash}-${pin}.html`;
+        const filename = `${contentHash}-${pin}.html`;
 
         console.log("post mustache worked"); // Log success
         try {
