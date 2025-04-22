@@ -32,11 +32,25 @@ const cardTemplateSource = `
               <h2 class="text-lg font-semibold mb-2 text-gray-800">Additional Information</h2>
               <pre class="whitespace-pre-wrap text-sm text-gray-700">{{markdownContent}}</pre>
           </div>
+          <div class="mt-6 text-center border-t border-gray-200 pt-4">
+              <h2 class="text-lg font-semibold mb-2 text-gray-800">Download/Share</h2>
+              <div id="qrcode" class="mx-auto"></div>
+              <p class="text-sm text-gray-600 mt-2">Scan to download/share</p>
+          </div>
           <footer class="text-center text-gray-500 text-sm mt-4 border-t border-gray-200 pt-4">
               Created: {{creationTimestamp}}<br>
               <a href="/{{profileId}}" class="text-blue-500 hover:underline">Update Profile</a>
           </footer>
       </div>
+      <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/qrcode.min.js"></script>
+      <script>
+          const qrcodeDiv = document.getElementById('qrcode');
+          const cardUrlWithoutPin = window.location.origin + '/card/' + '{{contentHash}}';
+          QRCode.toCanvas(qrcodeDiv, cardUrlWithoutPin, { width: 128, height: 128 }, function (error) {
+              if (error) console.error(error);
+              console.log('QR code generated!');
+          });
+      </script>
   </body>
   </html>
 `;
@@ -173,8 +187,11 @@ export default {
           }
         }
 
-        console.log("photo variables setup");
-
+        const contentHash = crypto
+          .createHash("sha256")
+          .update(html)
+          .digest("hex");
+ 
         const profileData = {
           name,
           photo: photoBase64,
@@ -192,14 +209,11 @@ export default {
             .createHash("sha256")
             .update(JSON.stringify(formData))
             .digest("hex"),
+          contentHash: contentHash
         };
         console.log("pre mustache"); // Log success
         const html = Mustache.render(cardTemplateSource, profileData);
-        const contentHash = crypto
-          .createHash("sha256")
-          .update(html)
-          .digest("hex");
-        const filename = `${contentHash}-${pin}.html`;
+k       const filename = `${contentHash}-${pin}.html`;
 
         console.log("post mustache worked"); // Log success
         try {
