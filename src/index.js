@@ -42,7 +42,7 @@ const cardTemplateSource = `
               <a href="/{{profileId}}" class="text-blue-500 hover:underline">Update Profile</a>
           </footer>
       </div>
-      <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/lib/browser.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/dist/qrcode.min.js"></script>
       <script>
           const qrcodeDiv = document.getElementById('qrcode');
           const cardUrlWithoutPin = window.location.origin + '/card/' + '{{contentHash}}';
