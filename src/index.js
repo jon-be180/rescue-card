@@ -187,11 +187,6 @@ export default {
           }
         }
 
-        const contentHash = crypto
-          .createHash("sha256")
-          .update(html)
-          .digest("hex");
-
         const profileData = {
           name,
           photo: photoBase64,
@@ -209,11 +204,11 @@ export default {
             .createHash("sha256")
             .update(JSON.stringify(formData))
             .digest("hex"),
-          contentHash: contentHash,
         };
+
         console.log("pre mustache"); // Log success
         const html = Mustache.render(cardTemplateSource, profileData);
-        const filename = `${contentHash}-${pin}.html`;
+        const filename = `${profileId}-${pin}.html`;
 
         console.log("post mustache worked"); // Log success
         try {
@@ -222,7 +217,7 @@ export default {
           });
           console.log("R2 Put Result (Success):", JSON.stringify(r2Result)); // Log success
           return Response.redirect(
-            `${url.origin}/card/${contentHash}?pin=${pin}`,
+            `${url.origin}/card/${profileId}?pin=${pin}`,
             303,
           );
         } catch (error) {
