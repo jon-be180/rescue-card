@@ -44,12 +44,18 @@ const cardTemplateSource = `
       </div>
       <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/dist/qrcode.min.js"></script>
       <script>
+        window.onload = function() {
           const qrcodeDiv = document.getElementById('qrcode');
-          const cardUrlWithoutPin = window.location.origin + '/card/' + '{{contentHash}}';
-          QRCode.toCanvas(qrcodeDiv, cardUrlWithoutPin, { width: 128, height: 128 }, function (error) {
+          const cardUrlWithoutPin = window.location.origin + '/card/' + '{{profileId}}';
+          if (typeof QRCode !== 'undefined' && qrcodeDiv) {
+            QRCode.toCanvas(qrcodeDiv, cardUrlWithoutPin, { width: 128, height: 128 }, function (error) {
               if (error) console.error(error);
               console.log('QR code generated!');
-          });
+            });
+          } else {
+            console.error('QRCode library not loaded or qrcode div not found.');
+          }
+        };
       </script>
   </body>
   </html>
