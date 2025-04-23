@@ -208,7 +208,7 @@ export default {
 
         console.log("pre mustache"); // Log success
         const html = Mustache.render(cardTemplateSource, profileData);
-        const filename = `${profileId}-${pin}.html`;
+        const filename = `${profileData.profileId}-${pin}.html`;
 
         console.log("post mustache worked"); // Log success
         try {
@@ -217,7 +217,7 @@ export default {
           });
           console.log("R2 Put Result (Success):", JSON.stringify(r2Result)); // Log success
           return Response.redirect(
-            `${url.origin}/card/${profileId}?pin=${pin}`,
+            `${url.origin}/card/${profileData.profileId}?pin=${pin}`,
             303,
           );
         } catch (error) {
