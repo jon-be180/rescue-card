@@ -34,7 +34,9 @@ const cardTemplateSource = `
           </div>
           <div class="mt-6 text-center border-t border-gray-200 pt-4">
               <h2 class="text-lg font-semibold mb-2 text-gray-800">Download/Share</h2>
-              <div id="qrcode" class="mx-auto"></div>
+              <div class="flex justify-center items-center w-full h-64 bg-gray-100">
+                  <div id="qrcode" class="mx-auto"></div>
+              </div>
               <p class="text-sm text-gray-600 mt-2">Scan to download/share</p>
           </div>
           <footer class="text-center text-gray-500 text-sm mt-4 border-t border-gray-200 pt-4">
