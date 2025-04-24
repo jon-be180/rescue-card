@@ -185,9 +185,26 @@ export default {
         if (photoFile instanceof File && photoFile.size > 0) {
           try {
             const arrayBuffer = await photoFile.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const base64 = buffer.toString("base64");
-            photoBase64 = base64;
+            const bitmap = await createImageBitmap(new Blob([arrayBuffer]));
+
+            const targetWidth = 200;
+            const targetHeight = 200;
+
+            const canvas = new OffscreenCanvas(targetWidth, targetHeight);
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(
+              bitmap,
+              0,
+              0,
+              bitmap.width,
+              bitmap.height,
+              0,
+              0,
+              targetWidth,
+              targetHeight,
+            );
+
+            photoBase64 = await canvas.convertToDataURL(photoFile.type);
             photoContentType = photoFile.type;
           } catch (error) {
             console.error("Error during image processing:", error);
