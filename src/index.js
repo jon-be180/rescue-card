@@ -42,20 +42,19 @@ const cardTemplateSource = `
               <a href="/{{profileId}}" class="text-blue-500 hover:underline">Update Profile</a>
           </footer>
       </div>
-      <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/dist/qrcode.min.js"></script>
+      <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
       <script>
-        window.onload = function() {
           const qrcodeDiv = document.getElementById('qrcode');
-          const cardUrlWithoutPin = window.location.origin + '/card/' + '{{profileId}}';
-          if (typeof QRCode !== 'undefined' && qrcodeDiv) {
-            QRCode.toCanvas(qrcodeDiv, cardUrlWithoutPin, { width: 128, height: 128 }, function (error) {
-              if (error) console.error(error);
-              console.log('QR code generated!');
-            });
-          } else {
-            console.error('QRCode library not loaded or qrcode div not found.');
-          }
-        };
+          const urlToEncode = window.location.origin + '/card/' + '{{profileId}}';
+
+          const qrcode = new QRCode(qrcodeDiv, {
+              text: urlToEncode,
+              width: 128,
+              height: 128,
+              colorDark : "#000000",
+              colorLight : "#ffffff",
+              correctLevel : QRCode.CorrectLevel.H
+          });
       </script>
   </body>
   </html>
