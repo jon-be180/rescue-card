@@ -10,6 +10,7 @@ const cardTemplateSource = `
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Rescue Card</title>
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   </head>
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
@@ -70,6 +71,7 @@ const cardPinTemplateSource = `
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Enter PIN</title>
               <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+              <link rel="icon" href="/favicon.svg" type="image/svg+xml">
           </head>
           <body class="bg-gray-100 flex justify-center items-center min-h-screen">
               <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
@@ -96,6 +98,7 @@ const generatorFormHTML = `
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Rescue Card Generator</title>
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   </head>
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
