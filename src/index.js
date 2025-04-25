@@ -249,6 +249,23 @@ export default {
           return new Response("Error saving Rescue Card", { status: 500 });
         }
       }
+    } else if (url.pathname.startsWith("/favicon.svg")) {
+      try {
+        const object = await env.R2.get('favicon.svg');
+        if (object === null) {
+          return new Response('favicon.svg not found in R2', { status: 404 });
+        }
+        const headers = new Headers();
+        object.writeHttpMetadata(headers);
+        headers.set('etag', object.httpEtag);
+        headers.set('Content-Type', 'image/svg+xml'); // Set the correct content type
+        return new Response(object.body, {
+          headers,
+        });
+      } catch (error) {
+        console.error('Error fetching favicon from R2:', error);
+        return new Response('Error fetching favicon', { status: 500 });
+      }
     } else if (url.pathname.startsWith("/card/")) {
       const parts = url.pathname.split("/");
       const contentHash = parts[2];
