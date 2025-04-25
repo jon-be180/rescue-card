@@ -10,7 +10,7 @@ const cardTemplateSource = `
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Rescue Card</title>
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+      <link rel="icon" href="/favicon.png" type="image/png">
   </head>
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
@@ -71,7 +71,7 @@ const cardPinTemplateSource = `
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Enter PIN</title>
               <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-              <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+              <link rel="icon" href="/favicon.png" type="image/png">
           </head>
           <body class="bg-gray-100 flex justify-center items-center min-h-screen">
               <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
@@ -98,7 +98,7 @@ const generatorFormHTML = `
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Rescue Card Generator</title>
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-      <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+      <link rel="icon" href="/favicon.png" type="image/png">
   </head>
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
       <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
@@ -252,22 +252,22 @@ export default {
           return new Response("Error saving Rescue Card", { status: 500 });
         }
       }
-    } else if (url.pathname.startsWith("/favicon.svg")) {
+    } else if (url.pathname.startsWith("/favicon.png")) {
       try {
-        const object = await env.R2.get('favicon.svg');
+        const object = await env.R2.get("favicon.png");
         if (object === null) {
-          return new Response('favicon.svg not found in R2', { status: 404 });
+          return new Response("favicon not found in R2", { status: 404 });
         }
         const headers = new Headers();
         object.writeHttpMetadata(headers);
-        headers.set('etag', object.httpEtag);
-        headers.set('Content-Type', 'image/svg+xml'); // Set the correct content type
+        headers.set("etag", object.httpEtag);
+        headers.set("Content-Type", "image/png"); // Set the correct content type
         return new Response(object.body, {
           headers,
         });
       } catch (error) {
-        console.error('Error fetching favicon from R2:', error);
-        return new Response('Error fetching favicon', { status: 500 });
+        console.error("Error fetching favicon from R2:", error);
+        return new Response("Error fetching favicon", { status: 500 });
       }
     } else if (url.pathname.startsWith("/card/")) {
       const parts = url.pathname.split("/");
