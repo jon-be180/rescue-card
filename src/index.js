@@ -2,6 +2,9 @@ import Mustache from "mustache";
 import crypto from "crypto";
 import { Image } from "image-js";
 
+// Define a maximum allowed file size (in bytes) - adjust as needed
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB (example)
+
 // Your template string
 const cardTemplateSource = `
   <!DOCTYPE html>
@@ -270,12 +273,19 @@ export default {
 
         // Inside your POST request handler:
         if (photoFile instanceof File && photoFile.size > 0) {
-          const resizedBase64 = await resizeImage(photoFile);
-          if (resizedBase64) {
-            photoBase64 = resizedBase64;
-            photoContentType = photoFile.type;
+          if (photoFile.size <= MAX_FILE_SIZE) {
+            const resizedBase64 = await resizeImage(photoFile);
+            if (resizedBase64) {
+              photoBase64 = resizedBase64;
+              photoContentType = photoFile.type;
+            } else {
+              console.log("resize failed", resizedBase64);
+            }
           } else {
-            console.log("resize failed", resizedBase64);
+            return new Response(
+              "File size too large (max 1MB). Please upload a smaller image.",
+              { status: 400 },
+            );
           }
         }
 
