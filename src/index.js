@@ -1,5 +1,6 @@
 import Mustache from "mustache";
 import crypto from "crypto";
+import { resizeFile } from "browser-image-resizer";
 
 // Your template string
 const cardTemplateSource = `
@@ -213,6 +214,21 @@ const incorrectPinTemplate = `
 </html>
 `;
 
+async function resizeImage(file) {
+  try {
+    const resizedImage = await resizeFile(file, {
+      maxWidth: 200,
+      maxHeight: 200,
+      // ... other options
+      outputType: "base64", // Or 'blob', 'file' depending on what the library supports in this env.
+    });
+    return resizedImage;
+  } catch (error) {
+    console.error("Error resizing image:", error);
+    return null;
+  }
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -243,32 +259,14 @@ export default {
         let photoBase64 = null;
         let photoContentType = null;
 
+        // Inside your POST request handler:
         if (photoFile instanceof File && photoFile.size > 0) {
-          try {
-            const arrayBuffer = await photoFile.arrayBuffer();
-            const bitmap = await createImageBitmap(new Blob([arrayBuffer]));
-
-            const targetWidth = 200;
-            const targetHeight = 200;
-
-            const canvas = new OffscreenCanvas(targetWidth, targetHeight);
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(
-              bitmap,
-              0,
-              0,
-              bitmap.width,
-              bitmap.height,
-              0,
-              0,
-              targetWidth,
-              targetHeight,
-            );
-
-            photoBase64 = await canvas.convertToDataURL(photoFile.type);
+          const resizedBase64 = await resizeImage(photoFile);
+          if (resizedBase64) {
+            photoBase64 = resizedBase64;
             photoContentType = photoFile.type;
-          } catch (error) {
-            console.error("Error during image processing:", error);
+          } else {
+            console.log("resize failed", resizedBase64);
           }
         }
 
