@@ -3,11 +3,11 @@ import crypto from "crypto";
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
 
-import formHTML from "templates/form.html";
-import cardHTML from "templates/card.html";
-import updateCardHTML from "templates/update_card.html";
-import cardPinHTML from "templates/card_pin.html";
-import incorrectPinHTML from "templates/incorrect_pin.html";
+import formHTML from "./templates/form.html";
+import cardHTML from "./templates/card.html";
+import updateCardHTML from "./templates/update_card.html";
+import cardPinHTML from "./templates/card_pin.html";
+import incorrectPinHTML from "./templates/incorrect_pin.html";
 
 async function getBase64(file) {
   const arrayBuffer = await file.arrayBuffer();
