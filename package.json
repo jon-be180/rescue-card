@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "mustache": "^4.2.0",
-    "pica": "^9.0.1"
+    "image-js": "^0.37.0",
+    "mustache": "^4.2.0"
   }
 }
