@@ -217,14 +217,10 @@ const incorrectPinTemplate = `
 `;
 
 async function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      resolve(reader.result.split(",")[1]); // Extract the base64 data part
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const base64 = buffer.toString("base64");
+  return base64;
 }
 
 export default {
