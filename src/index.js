@@ -350,7 +350,10 @@ export default {
           });
         } else {
           const htmlContent = Mustache.render(incorrectPinTemplate);
-          return new Response(htmlContent, { status: 404 });
+          return new Response(htmlContent, {
+            status: 404,
+            "Content-Type": "text/html",
+          });
         }
       }
     } else if (url.pathname.startsWith("/")) {
