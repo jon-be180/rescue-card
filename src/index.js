@@ -155,6 +155,64 @@ const generatorFormHTML = `
   </html>
 `;
 
+const incorrectPinTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIN Incorrect</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <style>
+        .error-container {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .error-heading {
+            color: #dc2626; /* Red color for error */
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            color: #4a5568;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            background-color: #6b7280; /* Gray button */
+            color: #fff;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .back-button:hover {
+            background-color: #4b5563; /* Darker gray on hover */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div class="error-container">
+        <h1 class="error-heading">PIN Incorrect</h1>
+        <p class="error-message">The PIN you entered is incorrect. Please try again.</p>
+        <button type="button" class="back-button" onclick="window.history.back();">Go Back</button>
+    </div>
+</body>
+</html>
+`;
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -291,7 +349,8 @@ export default {
             headers: { "Content-Type": "text/html" },
           });
         } else {
-          return new Response("Rescue Card Not Found", { status: 404 });
+          const htmlContent = Mustache.render(incorrectPinTemplate);
+          return new Response(htmlContent, { status: 404 });
         }
       }
     } else if (url.pathname.startsWith("/")) {
