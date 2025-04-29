@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "browser-image-resizer": "^2.4.1",
-    "mustache": "^4.2.0"
+    "mustache": "^4.2.0",
+    "pica": "^9.0.1"
   }
 }

@@ -1,6 +1,8 @@
 import Mustache from "mustache";
 import crypto from "crypto";
-import { resizeFile } from "browser-image-resizer";
+import Pica from "pica";
+
+const pica = new Pica();
 
 // Your template string
 const cardTemplateSource = `
@@ -216,15 +218,23 @@ const incorrectPinTemplate = `
 
 async function resizeImage(file) {
   try {
-    const resizedImage = await resizeFile(file, {
-      maxWidth: 200,
-      maxHeight: 200,
-      // ... other options
-      outputType: "base64", // Or 'blob', 'file' depending on what the library supports in this env.
-    });
-    return resizedImage;
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Pica typically works with Canvas/ImageData. We might need to use a
+    // Buffer-to-ImageData conversion or see if Pica has a direct buffer API.
+    // This part might require some investigation into Pica's API.
+
+    // One potential approach:
+    const img = await createImageBitmap(new Blob([buffer]));
+    const canvas = new OffscreenCanvas(200, 200);
+    await pica.resize(img, canvas, { quality: 3 }); // Example quality setting
+    const resizedBlob = await canvas.convertToBlob(file.type);
+    const resizedBuffer = await resizedBlob.arrayBuffer();
+    const resizedBase64 = Buffer.from(resizedBuffer).toString("base64");
+    return resizedBase64;
   } catch (error) {
-    console.error("Error resizing image:", error);
+    console.error("Error resizing image with pica:", error);
     return null;
   }
 }
