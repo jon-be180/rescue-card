@@ -3,6 +3,6 @@
     "mustache": "^4.2.0"
   },
   "scripts": {
-    "build": "esbuild index.js --bundle --outfile=./dist/index.js --platform=browser --format=esm --loader:.html=text"
+    "build": "esbuild ./src/index.js --bundle --outfile=./dist/index.js --platform=browser --format=esm --loader:.html=text"
   }
 }
