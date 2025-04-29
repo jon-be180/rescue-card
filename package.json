@@ -1,9 +1,8 @@
 {
   "dependencies": {
-    "crypto": "^1.0.1",
     "mustache": "^4.2.0"
   },
   "scripts": {
-    "build": "esbuild ./src/index.js --bundle --outfile=./dist/index.js --platform=browser --format=esm --loader:.html=text"
+    "build": "esbuild ./src/index.js --bundle --outfile=./dist/index.js --platform=node --format=esm --loader:.html=text"
   }
 }
