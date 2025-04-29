@@ -1,6 +1,5 @@
 import Mustache from "mustache";
 import crypto from "crypto";
-import { Image } from "image-js";
 
 // Define a maximum allowed file size (in bytes) - adjust as needed
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB (example)
@@ -217,28 +216,15 @@ const incorrectPinTemplate = `
 </html>
 `;
 
-async function resizeImage(file) {
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Create an Image object from the buffer
-    const image = await Image.load(buffer);
-
-    // Resize the image
-    const resizedImage = image.resize({ width: 200, height: 200 });
-
-    // Get the data as a Buffer (e.g., PNG format)
-    const resizedBuffer = await resizedImage.encode({ format: "png" });
-
-    // Convert the Buffer to Base64
-    const resizedBase64 = resizedBuffer.toString("base64");
-    const contentType = "image/png"; // Since we encoded as PNG
-    return { base64: resizedBase64, contentType: contentType };
-  } catch (error) {
-    console.error("Error resizing image with image-js:", error);
-    return null;
-  }
+async function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result.split(",")[1]); // Extract the base64 data part
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 export default {
@@ -274,13 +260,8 @@ export default {
         // Inside your POST request handler:
         if (photoFile instanceof File && photoFile.size > 0) {
           if (photoFile.size <= MAX_FILE_SIZE) {
-            const resizedBase64 = await resizeImage(photoFile);
-            if (resizedBase64) {
-              photoBase64 = resizedBase64;
-              photoContentType = photoFile.type;
-            } else {
-              console.log("resize failed", resizedBase64);
-            }
+            photoBase64 = await getBase64(photoFile);
+            photoContentType = photoFile.type;
           } else {
             return new Response(
               "File size too large (max 1MB). Please upload a smaller image.",

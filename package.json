@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "image-js": "^0.37.0",
     "mustache": "^4.2.0"
   }
 }
