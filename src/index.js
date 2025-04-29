@@ -1,220 +1,13 @@
 import Mustache from "mustache";
 import crypto from "crypto";
 
-// Define a maximum allowed file size (in bytes) - adjust as needed
-const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB (example)
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
 
-// Your template string
-const cardTemplateSource = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Rescue Card</title>
-      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-      <link rel="icon" href="/favicon.png" type="image/png">
-  </head>
-  <body class="bg-gray-100 flex justify-center items-center min-h-screen">
-      <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-          <h1 class="text-2xl font-bold mb-4 text-center text-red-600">{{name}}</h1>
-          <img src="data:{{photoContentType}};base64,{{photo}}" alt="Profile Photo" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
-          <div class="mb-4 border-t border-gray-200 pt-4">
-              <h2 class="text-lg font-semibold mb-2 text-gray-800">Emergency Contact</h2>
-              <p><strong class="font-semibold">Name:</strong> {{emergencyContactName}}</p>
-              <p><strong class="font-semibold">Phone:</strong> {{emergencyContactPhone}}</p>
-              <p><strong class="font-semibold">Relationship:</strong> {{emergencyContactRelationship}}</p>
-          </div>
-          <div class="mb-4 border-t border-gray-200 pt-4">
-              <h2 class="text-lg font-semibold mb-2 text-gray-800">Medical Information</h2>
-              <p><strong class="font-semibold">Blood Type:</strong> {{bloodType}}</p>
-              <p><strong class="font-semibold">Allergies:</strong> {{allergies}}</p>
-              <p><strong class="font-semibold">Medications:</strong> {{medications}}</p>
-              <p><strong class="font-semibold">Medical Conditions:</strong> {{medicalConditions}}</p>
-          </div>
-          <div class="mb-4 border-t border-gray-200 pt-4">
-              <h2 class="text-lg font-semibold mb-2 text-gray-800">Additional Information</h2>
-              <pre class="whitespace-pre-wrap text-sm text-gray-700">{{markdownContent}}</pre>
-          </div>
-          <div class="mt-6 text-center border-t border-gray-200 pt-4">
-              <h2 class="text-lg font-semibold mb-2 text-gray-800">Download/Share</h2>
-              <div class="flex justify-center items-center w-full h-64 bg-gray-100">
-                  <div id="qrcode" class="mx-auto"></div>
-              </div>
-              <p class="text-sm text-gray-600 mt-2">Scan to download/share</p>
-          </div>
-          <footer class="text-center text-gray-500 text-sm mt-4 border-t border-gray-200 pt-4">
-              Created: {{creationTimestamp}}<br>
-              <a href="/{{profileId}}" class="text-blue-500 hover:underline">Update Profile</a>
-          </footer>
-      </div>
-      <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-      <script>
-          const qrcodeDiv = document.getElementById('qrcode');
-          const urlToEncode = window.location.origin + '/card/' + '{{profileId}}';
-
-          const qrcode = new QRCode(qrcodeDiv, {
-              text: urlToEncode,
-              width: 128,
-              height: 128,
-              colorDark : "#000000",
-              colorLight : "#ffffff",
-              correctLevel : QRCode.CorrectLevel.H
-          });
-      </script>
-  </body>
-  </html>
-`;
-
-const cardPinTemplateSource = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Enter PIN</title>
-              <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-              <link rel="icon" href="/favicon.png" type="image/png">
-          </head>
-          <body class="bg-gray-100 flex justify-center items-center min-h-screen">
-              <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-                  <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Enter PIN</h1>
-                  <form method="GET" action="/card/{{contentHash}}">
-                      <div class="mb-4">
-                          <label for="pin" class="block text-gray-700 text-sm font-bold mb-2">PIN:</label>
-                          <input type="password" id="pin" name="pin" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                      </div>
-                      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">View Card</button>
-                  </form>
-                  <p class="mt-4 text-gray-600 text-sm">If you've lost your PIN, please contact the card creator.</p>
-              </div>
-          </body>
-          </html>
-        `;
-
-// Basic HTML for the generator form (you can expand on this)
-const generatorFormHTML = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Rescue Card Generator</title>
-      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-      <link rel="icon" href="/favicon.png" type="image/png">
-  </head>
-  <body class="bg-gray-100 flex justify-center items-center min-h-screen">
-      <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-          <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Rescue Card Generator</h1>
-          <form id="generatorForm" method="POST" action="/" enctype="multipart/form-data">
-              <div class="mb-4">
-                  <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-                  <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="photo" class="block text-gray-700 text-sm font-bold mb-2">Profile Photo:</label>
-                  <input type="file" id="photo" name="photo" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="markdownContent" class="block text-gray-700 text-sm font-bold mb-2">Markdown Content:</label>
-                  <textarea id="markdownContent" name="markdownContent" rows="5" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
-              </div>
-              <div class="mb-4">
-                  <label for="pin" class="block text-gray-700 text-sm font-bold mb-2">PIN:</label>
-                  <input type="password" id="pin" name="pin" minlength="4" maxlength="4" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="bloodType" class="block text-gray-700 text-sm font-bold mb-2">Blood Type:</label>
-                  <input type="text" id="bloodType" name="bloodType" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="allergies" class="block text-gray-700 text-sm font-bold mb-2">Allergies:</label>
-                  <input type="text" id="allergies" name="allergies" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="medications" class="block text-gray-700 text-sm font-bold mb-2">Medications:</label>
-                  <input type="text" id="medications" name="medications" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="medicalConditions" class="block text-gray-700 text-sm font-bold mb-2">Medical Conditions:</label>
-                  <input type="text" id="medicalConditions" name="medicalConditions" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="emergencyContactName" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Name:</label>
-                  <input type="text" id="emergencyContactName" name="emergencyContactName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="emergencyContactPhone" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Phone:</label>
-                  <input type="text" id="emergencyContactPhone" name="emergencyContactPhone" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <div class="mb-4">
-                  <label for="emergencyContactRelationship" class="block text-gray-700 text-sm font-bold mb-2">Emergency Contact Relationship:</label>
-                  <input type="text" id="emergencyContactRelationship" name="emergencyContactRelationship" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              </div>
-              <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Generate Rescue Card</button>
-          </form>
-      </div>
-  </body>
-  </html>
-`;
-
-const incorrectPinTemplate = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIN Incorrect</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <style>
-        .error-container {
-            background-color: #fff;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            padding: 3rem;
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
-        }
-
-        .error-heading {
-            color: #dc2626; /* Red color for error */
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .error-message {
-            color: #4a5568;
-            font-size: 1.125rem;
-            margin-bottom: 2rem;
-        }
-
-        .back-button {
-            background-color: #6b7280; /* Gray button */
-            color: #fff;
-            font-weight: bold;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.375rem;
-            text-decoration: none;
-            transition: background-color 0.15s ease-in-out;
-        }
-
-        .back-button:hover {
-            background-color: #4b5563; /* Darker gray on hover */
-        }
-    </style>
-</head>
-<body class="bg-gray-100 flex justify-center items-center min-h-screen">
-    <div class="error-container">
-        <h1 class="error-heading">PIN Incorrect</h1>
-        <p class="error-message">The PIN you entered is incorrect. Please try again.</p>
-        <button type="button" class="back-button" onclick="window.history.back();">Go Back</button>
-    </div>
-</body>
-</html>
-`;
+import formHTML from "templates/form.html";
+import cardHTML from "templates/card.html";
+import updateCardHTML from "templates/update_card.html";
+import cardPinHTML from "templates/card_pin.html";
+import incorrectPinHTML from "templates/incorrect_pin.html";
 
 async function getBase64(file) {
   const arrayBuffer = await file.arrayBuffer();
@@ -229,7 +22,7 @@ export default {
 
     if (url.pathname === "/") {
       if (request.method === "GET") {
-        return new Response(generatorFormHTML, {
+        return new Response(formHTML, {
           headers: { "Content-Type": "text/html" },
         });
       } else if (request.method === "POST") {
@@ -286,7 +79,7 @@ export default {
         };
 
         console.log("pre mustache"); // Log success
-        const html = Mustache.render(cardTemplateSource, profileData);
+        const html = Mustache.render(cardHTML, profileData);
         const filename = `${profileData.profileId}-${pin}.html`;
 
         console.log("post mustache worked"); // Log success
@@ -330,7 +123,7 @@ export default {
 
       if (!pin) {
         // Serve a PIN entry form
-        const cardPinHtml = Mustache.render(cardPinTemplateSource, {
+        const cardPinHtml = Mustache.render(cardPinHTML, {
           contentHash,
         });
         return new Response(cardPinHtml, {
@@ -343,7 +136,7 @@ export default {
             headers: { "Content-Type": "text/html" },
           });
         } else {
-          const htmlContent = Mustache.render(incorrectPinTemplate);
+          const htmlContent = Mustache.render(incorrectPinHTML);
           return new Response(htmlContent, {
             status: 404,
             "Content-Type": "text/html",
@@ -352,29 +145,10 @@ export default {
       }
     } else if (url.pathname.startsWith("/")) {
       const profileId = url.pathname.split("/")[2];
-      return new Response(
-        `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Update Rescue Card</title>
-            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-        </head>
-        <body class="bg-gray-100 flex justify-center items-center min-h-screen">
-            <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-                <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">Update Rescue Card</h1>
-                <p>Update form for profile ID: ${profileId} (Functionality to be implemented)</p>
-                <a href="/" class="inline-block bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4">Back to Generator</a>
-            </div>
-        </body>
-        </html>
-      `,
-        {
-          headers: { "Content-Type": "text/html" },
-        },
-      );
+      const htmlContent = Mustache.render(updateCardHTML);
+      return new Response(htmlContent, {
+        headers: { "Content-Type": "text/html" },
+      });
     }
 
     return new Response("Not Found", { status: 404 });

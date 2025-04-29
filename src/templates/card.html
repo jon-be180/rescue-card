@@ -1,0 +1,83 @@
+const cardHTML = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rescue Card</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" href="/favicon.png" type="image/png">
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="bg-white rounded-lg shadow-md p-6 max-w-xl mx-auto">
+        <h1 class="text-2xl font-bold text-red-600 text-center mb-6">RESCUE CARD</h1>
+
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="flex justify-center items-center">
+                <img src="data:{{photoContentType}};base64,{{photo}}" alt="Profile Photo" class="rounded-full w-24 h-24 object-cover">
+            </div>
+            <div class="flex flex-col justify-center items-center">
+                <h2 class="text-xl font-semibold text-gray-800">{{name}}</h2>
+            </div>
+            <div class="flex justify-center items-center">
+                <div id="qrcode" class="mx-auto"></div>
+            </div>
+        </div>
+
+        <div class="mb-4 border-t pt-4">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Personal Information</h3>
+            <div class="grid grid-cols-2 gap-2">
+                <div><span class="font-bold">Blood Type:</span> {{bloodType || 'N/A'}}</div>
+                <div><span class="font-bold">Allergies:</span> {{allergies || 'N/A'}}</div>
+                <div><span class="font-bold">Medications:</span> {{medications || 'N/A'}}</div>
+            </div>
+        </div>
+
+        <div class="mb-4 border-t pt-4">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Medical Details</h3>
+            <div><span class="font-bold">Medical Conditions:</span> {{medicalConditions || 'N/A'}}</div>
+        </div>
+
+        <div class="mb-4 border-t pt-4">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Additional Information</h3>
+            <div class="prose">
+                <pre class="whitespace-pre-wrap text-sm text-gray-700">{{markdownContent || 'No additional information provided.'}}</pre>
+            </div>
+        </div>
+
+        <div class="border-t pt-4">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Emergency Contact</h3>
+            <div>
+                <span class="font-bold">Name:</span> {{emergencyContactName || 'N/A'}
+            </div>
+            <div>
+                <span class="font-bold">Phone:</span> {{emergencyContactPhone || 'N/A'}
+            </div>
+            <div>
+                <span class="font-bold">Relationship:</span> {{emergencyContactRelationship || 'N/A'}
+            </div>
+        </div>
+
+        <footer class="text-center text-gray-500 text-sm mt-4 border-t pt-4">
+            Created: {{creationTimestamp}}<br>
+            <a href="/{{profileId}}" class="text-blue-500 hover:underline">Update Profile</a>
+        </footer>
+    </div>
+
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        const qrcodeDiv = document.getElementById('qrcode');
+        const urlToEncode = window.location.origin + '/card/' + '{{profileId}}';
+
+        const qrcode = new QRCode(qrcodeDiv, {
+            text: urlToEncode,
+            width: 96, // Slightly smaller QR code
+            height: 96, // Slightly smaller QR code
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
+</body>
+</html>
+`;

@@ -1,0 +1,177 @@
+const formHTML = `
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rescue Card Generator</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+  </head>
+  <body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+      <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">
+        Rescue Card Generator
+      </h1>
+      <form
+        id="generatorForm"
+        method="POST"
+        action="/"
+        enctype="multipart/form-data"
+      >
+        <div class="mb-4">
+          <label for="name" class="block text-gray-700 text-sm font-bold mb-2"
+            >Name:</label
+          >
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="photo" class="block text-gray-700 text-sm font-bold mb-2"
+            >Profile Photo:</label
+          >
+          <input
+            type="file"
+            id="photo"
+            name="photo"
+            accept="image/*"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="markdownContent"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Markdown Content:</label
+          >
+          <textarea
+            id="markdownContent"
+            name="markdownContent"
+            rows="5"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          ></textarea>
+        </div>
+        <div class="mb-4">
+          <label for="pin" class="block text-gray-700 text-sm font-bold mb-2"
+            >PIN:</label
+          >
+          <input
+            type="password"
+            id="pin"
+            name="pin"
+            minlength="4"
+            maxlength="4"
+            required
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="bloodType"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Blood Type:</label
+          >
+          <input
+            type="text"
+            id="bloodType"
+            name="bloodType"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="allergies"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Allergies:</label
+          >
+          <input
+            type="text"
+            id="allergies"
+            name="allergies"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="medications"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Medications:</label
+          >
+          <input
+            type="text"
+            id="medications"
+            name="medications"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="medicalConditions"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Medical Conditions:</label
+          >
+          <input
+            type="text"
+            id="medicalConditions"
+            name="medicalConditions"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="emergencyContactName"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Emergency Contact Name:</label
+          >
+          <input
+            type="text"
+            id="emergencyContactName"
+            name="emergencyContactName"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="emergencyContactPhone"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Emergency Contact Phone:</label
+          >
+          <input
+            type="text"
+            id="emergencyContactPhone"
+            name="emergencyContactPhone"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div class="mb-4">
+          <label
+            for="emergencyContactRelationship"
+            class="block text-gray-700 text-sm font-bold mb-2"
+            >Emergency Contact Relationship:</label
+          >
+          <input
+            type="text"
+            id="emergencyContactRelationship"
+            name="emergencyContactRelationship"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <button
+          type="submit"
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Generate Rescue Card
+        </button>
+      </form>
+    </div>
+  </body>
+</html>
+`;
