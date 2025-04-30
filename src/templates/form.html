@@ -24,66 +24,187 @@
           box-shadow: none;
         }
       }
+
+      /* Tooltip styles */
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 150px;
+        background-color: #374151; /* Dark gray */
+        color: #f3f4f6; /* Light gray */
+        text-align: center;
+        border-radius: 0.375rem;
+        padding: 0.5rem;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #374151 transparent transparent transparent;
+      }
+
+      /* Form styling to match card */
+      .form-container {
+        background-color: #f9fafb; /* Light gray background */
+        border-radius: 0.5rem;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 2rem;
+        max-width: 600px; /* Slightly wider form */
+        width: 100%;
+      }
+
+      .form-title {
+        color: #dc2626; /* Red color */
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-label {
+        display: block;
+        color: #374151; /* Dark gray */
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      .form-input,
+      .form-select,
+      .form-textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db; /* Light gray border */
+        border-radius: 0.375rem;
+        box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+        font-size: 0.875rem;
+      }
+
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: #6366f1; /* Indigo focus color */
+        box-shadow:
+          rgba(99, 102, 241, 0.25) 0px 1px 2px 0px,
+          rgba(99, 102, 241, 0.1) 0px 0px 0px 3px;
+      }
+
+      .form-error {
+        color: #dc2626; /* Red error text */
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+      }
+
+      .submit-button {
+        background-color: #dc2626; /* Red submit button */
+        color: #f9fafb; /* Light gray text */
+        font-weight: bold;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.375rem;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.15s ease-in-out;
+      }
+
+      .submit-button:hover {
+        background-color: #b91c1c; /* Darker red on hover */
+      }
     </style>
   </head>
+
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
-    <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-      <h1 class="text-2xl font-bold mb-6 text-center text-blue-600">
-        Rescue Card Generator
-      </h1>
+    <div class="form-container">
+      <h1 class="form-title">Rescue Card Generator</h1>
       <form
         id="generatorForm"
         method="POST"
         action="/"
         enctype="multipart/form-data"
       >
-        <div class="mb-4">
-          <label for="name" class="block text-gray-700 text-sm font-bold mb-2"
-            >Name:</label
-          >
+        <div class="form-group">
+          <label for="name" class="form-label tooltip">
+            Name:
+            <span class="tooltiptext"
+              >The name that will appear on the card.</span
+            >
+          </label>
           <input
             type="text"
             id="name"
             name="name"
             required
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
+            aria-describedby="name-error"
           />
+          <p id="name-error" class="form-error hidden">Please enter a name.</p>
         </div>
-        <div class="mb-4">
-          <label
-            id="photoLabel"
-            for="photo"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Profile Photo:</label
-          >
+        <div class="form-group">
+          <label for="photo" class="form-label tooltip">
+            Profile Photo (Max 1MB):
+            <span class="tooltiptext"
+              >A photo to display on the card. Maximum size is 1MB.</span
+            >
+          </label>
           <input
             type="file"
             id="photo"
             name="photo"
             accept="image/*"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
+            onchange="validateFileSize()"
           />
-          <p id="fileSizeError" class="text-red-500 text-sm mt-1 hidden">
+          <p id="fileSizeError" class="form-error hidden">
             File size exceeds 1MB.
           </p>
         </div>
-        <div class="mb-4">
-          <label
-            for="markdownContent"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Markdown Content:</label
-          >
+        <div class="form-group">
+          <label for="extraInformation" class="form-label tooltip">
+            Extra Information:
+            <span class="tooltiptext"
+              >Any additional information (Markdown accepted).</span
+            >
+          </label>
           <textarea
-            id="markdownContent"
+            id="extraInformation"
             name="markdownContent"
             rows="5"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-textarea"
           ></textarea>
         </div>
-        <div class="mb-4">
-          <label for="pin" class="block text-gray-700 text-sm font-bold mb-2"
-            >PIN:</label
-          >
+        <div class="form-group">
+          <label for="pin" class="form-label tooltip">
+            PIN:
+            <span class="tooltiptext">A 4-digit PIN for security.</span>
+          </label>
           <input
             type="password"
             id="pin"
@@ -91,108 +212,112 @@
             minlength="4"
             maxlength="4"
             required
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
+            aria-describedby="pin-error"
           />
+          <p id="pin-error" class="form-error hidden">
+            Please enter a 4-digit PIN.
+          </p>
         </div>
-        <div class="mb-4">
-          <label
-            for="bloodType"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Blood Type:</label
-          >
-          <input
-            type="text"
-            id="bloodType"
-            name="bloodType"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
+        <div class="form-group">
+          <label for="bloodType" class="form-label tooltip">
+            Blood Type:
+            <span class="tooltiptext">The person's blood type.</span>
+          </label>
+          <select id="bloodType" name="bloodType" class="form-select">
+            <option value="">Select Blood Type</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+          </select>
         </div>
-        <div class="mb-4">
-          <label
-            for="allergies"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Allergies:</label
-          >
+        <div class="form-group">
+          <label for="allergies" class="form-label tooltip">
+            Allergies:
+            <span class="tooltiptext">Any known allergies.</span>
+          </label>
           <input
             type="text"
             id="allergies"
             name="allergies"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
           />
         </div>
-        <div class="mb-4">
-          <label
-            for="medications"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Medications:</label
-          >
+        <div class="form-group">
+          <label for="medications" class="form-label tooltip">
+            Medications:
+            <span class="tooltiptext">Current medications.</span>
+          </label>
           <input
             type="text"
             id="medications"
             name="medications"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
           />
         </div>
-        <div class="mb-4">
-          <label
-            for="medicalConditions"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Medical Conditions:</label
-          >
+        <div class="form-group">
+          <label for="medicalConditions" class="form-label tooltip">
+            Medical Conditions:
+            <span class="tooltiptext">Existing medical conditions.</span>
+          </label>
           <input
             type="text"
             id="medicalConditions"
             name="medicalConditions"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
           />
         </div>
-        <div class="mb-4">
-          <label
-            for="emergencyContactName"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Emergency Contact Name:</label
-          >
+        <div class="form-group">
+          <label for="emergencyContactName" class="form-label tooltip">
+            Emergency Contact Name:
+            <span class="tooltiptext">Name of the emergency contact.</span>
+          </label>
           <input
             type="text"
             id="emergencyContactName"
             name="emergencyContactName"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
           />
         </div>
-        <div class="mb-4">
-          <label
-            for="emergencyContactPhone"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Emergency Contact Phone:</label
-          >
+        <div class="form-group">
+          <label for="emergencyContactPhone" class="form-label tooltip">
+            Emergency Contact Phone:
+            <span class="tooltiptext"
+              >Phone number of the emergency contact.</span
+            >
+          </label>
           <input
             type="text"
             id="emergencyContactPhone"
             name="emergencyContactPhone"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
           />
         </div>
-        <div class="mb-4">
-          <label
-            for="emergencyContactRelationship"
-            class="block text-gray-700 text-sm font-bold mb-2"
-            >Emergency Contact Relationship:</label
-          >
+        <div class="form-group">
+          <label for="emergencyContactRelationship" class="form-label tooltip">
+            Emergency Contact Relationship:
+            <span class="tooltiptext"
+              >Relationship to the emergency contact.</span
+            >
+          </label>
           <input
             type="text"
             id="emergencyContactRelationship"
             name="emergencyContactRelationship"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input"
           />
         </div>
-        <button
-          type="submit"
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
+        <button type="submit" class="submit-button">
           Generate Rescue Card
         </button>
       </form>
     </div>
+
     <script>
       const MAX_FILE_SIZE_MB = 1;
       const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
