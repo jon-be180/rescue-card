@@ -171,5 +171,34 @@
         </button>
       </form>
     </div>
+    <script>
+      const MAX_FILE_SIZE_MB = 1;
+      const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+      const fileInput = document.getElementById("photo");
+      const fileSizeError = document.getElementById("fileSizeError");
+      const form = document.getElementById("generatorForm");
+
+      function validateFileSize() {
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          if (file.size > MAX_FILE_SIZE_BYTES) {
+            fileSizeError.classList.remove("hidden");
+            fileInput.value = ""; // Clear the invalid file
+          } else {
+            fileSizeError.classList.add("hidden");
+          }
+        }
+      }
+
+      form.addEventListener("submit", function (event) {
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          if (file.size > MAX_FILE_SIZE_BYTES) {
+            event.preventDefault(); // Prevent form submission
+            fileSizeError.classList.remove("hidden");
+          }
+        }
+      });
+    </script>
   </body>
 </html>

@@ -8,6 +8,7 @@ import cardHTML from "./templates/card.html";
 import updateCardHTML from "./templates/update_card.html";
 import cardPinHTML from "./templates/card_pin.html";
 import incorrectPinHTML from "./templates/incorrect_pin.html";
+import cardErrorFilesizeHTML from "./templates/card_error_filesize.html";
 
 async function getBase64(file) {
   const arrayBuffer = await file.arrayBuffer();
@@ -52,8 +53,9 @@ export default {
             photoBase64 = await getBase64(photoFile);
             photoContentType = photoFile.type;
           } else {
+            const html = Mustache.render(cardErrorFilesizeHTML)
             return new Response(
-              "File size too large (max 1MB). Please upload a smaller image.",
+              html
               { status: 400 },
             );
           }
