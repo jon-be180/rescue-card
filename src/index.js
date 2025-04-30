@@ -53,11 +53,8 @@ export default {
             photoBase64 = await getBase64(photoFile);
             photoContentType = photoFile.type;
           } else {
-            const html = Mustache.render(cardErrorFilesizeHTML)
-            return new Response(
-              html
-              { status: 400 },
-            );
+            const html = Mustache.render(cardErrorFilesizeHTML);
+            return new Response(html, { status: 400 });
           }
         }
 
