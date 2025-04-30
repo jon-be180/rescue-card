@@ -196,6 +196,7 @@
       const fileInput = document.getElementById("photo");
       const fileSizeError = document.getElementById("fileSizeError");
       const form = document.getElementById("generatorForm");
+      let isFileSizeErrorVisible = false; // Track if the error is currently visible
 
       function validateFileSize() {
         if (fileInput.files.length > 0) {
@@ -203,10 +204,25 @@
           if (file.size > MAX_FILE_SIZE_BYTES) {
             fileSizeError.classList.remove("hidden");
             fileInput.value = ""; // Clear the invalid file
+            triggerErrorFeedback();
+            isFileSizeErrorVisible = true;
           } else {
             fileSizeError.classList.add("hidden");
+            fileInput.classList.remove("error-flash");
+            isFileSizeErrorVisible = false;
           }
+        } else {
+          fileInput.classList.remove("error-flash");
+          isFileSizeErrorVisible = false;
         }
+      }
+
+      function triggerErrorFeedback() {
+        fileInput.classList.add("error-flash");
+        setTimeout(() => {
+          fileInput.classList.remove("error-flash");
+        }, 500); // Remove flash after 0.5 seconds
+        fileSizeError.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the error
       }
 
       form.addEventListener("submit", function (event) {
@@ -215,7 +231,13 @@
           if (file.size > MAX_FILE_SIZE_BYTES) {
             event.preventDefault(); // Prevent form submission
             fileSizeError.classList.remove("hidden");
+            triggerErrorFeedback();
+            isFileSizeErrorVisible = true;
           }
+        } else if (isFileSizeErrorVisible) {
+          // If there was a previous error and no file is selected, ensure error is visible and scroll
+          fileSizeError.classList.remove("hidden");
+          triggerErrorFeedback();
         }
       });
     </script>
