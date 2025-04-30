@@ -9,6 +9,22 @@
       rel="stylesheet"
     />
     <link rel="icon" href="/favicon.png" type="image/png" />
+    <style>
+      .error-flash {
+        animation: flash 0.5s ease-in-out;
+      }
+
+      @keyframes flash {
+        0% {
+          border-color: #f56565; /* Red border */
+          box-shadow: 0 0 0 0.2rem rgba(245, 101, 101, 0.25);
+        }
+        100% {
+          border-color: #e0e0e0; /* Default border color (adjust if needed) */
+          box-shadow: none;
+        }
+      }
+    </style>
   </head>
   <body class="bg-gray-100 flex justify-center items-center min-h-screen">
     <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
