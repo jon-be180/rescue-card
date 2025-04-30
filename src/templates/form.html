@@ -50,7 +50,10 @@
           />
         </div>
         <div class="mb-4">
-          <label for="photo" class="block text-gray-700 text-sm font-bold mb-2"
+          <label
+            id="photoLabel"
+            for="photo"
+            class="block text-gray-700 text-sm font-bold mb-2"
             >Profile Photo:</label
           >
           <input
@@ -194,6 +197,7 @@
       const MAX_FILE_SIZE_MB = 1;
       const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
       const fileInput = document.getElementById("photo");
+      const photoLabel = document.getElementById("photoLabel");
       const fileSizeError = document.getElementById("fileSizeError");
       const form = document.getElementById("generatorForm");
       let isFileSizeErrorVisible = false; // Track if the error is currently visible
@@ -222,7 +226,7 @@
         setTimeout(() => {
           fileInput.classList.remove("error-flash");
         }, 500); // Remove flash after 0.5 seconds
-        fileInput.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the error
+        phtoLabel.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the error
       }
 
       form.addEventListener("submit", function (event) {
