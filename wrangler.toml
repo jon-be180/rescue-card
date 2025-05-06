@@ -2,14 +2,12 @@ name = "rescue-card"
 account_id = "046f5aadddfec2e200be18641d1105c6"
 workers_dev = true
 compatibility_date = "2025-04-16"
-main = "./dist/index.js"
 compatibility_flags = ["nodejs_compat"]
+main = "./dist/index.js"
 
 [build]
 command = "npm run build"
 
-[build.upload]
-format = "modules"
 
 [observability]
 enabled = true
@@ -18,3 +16,7 @@ head_sampling_rate = 1 # optional. default = 1.
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "rescue-card-storage"
+
+[dev]
+local_protocol = "http"
+

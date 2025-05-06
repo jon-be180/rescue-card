@@ -1,14 +1,17 @@
 import Mustache from "mustache";
 import crypto from "crypto";
+import path from "path";
+import fs from "fs/promises";
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
+const PUBLIC_PATH = path.join(process.cwd(), "public"); // Use the current working directory
 
-import formHTML from "./templates/form.html";
-import cardHTML from "./templates/card.html";
-import updateCardHTML from "./templates/update_card.html";
-import cardPinHTML from "./templates/card_pin.html";
-import incorrectPinHTML from "./templates/incorrect_pin.html";
-import cardErrorFilesizeHTML from "./templates/card_error_filesize.html";
+import formHTML from "../templates/form.html";
+import cardHTML from "../templates/card.html";
+import updateCardHTML from "../templates/update_card.html";
+import cardPinHTML from "../templates/card_pin.html";
+import incorrectPinHTML from "../templates/incorrect_pin.html";
+import cardErrorFilesizeHTML from "../templates/card_error_filesize.html";
 
 async function getBase64(file) {
   const arrayBuffer = await file.arrayBuffer();
@@ -20,6 +23,10 @@ async function getBase64(file) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+
+    if (process.env.NODE_ENV === "development") {
+      await seedLocalR2(env);
+    }
 
     if (url.pathname === "/") {
       if (request.method === "GET") {
@@ -95,23 +102,6 @@ export default {
           console.error("Error saving to R2:", error); // Log the error object if put fails
           return new Response("Error saving Rescue Card", { status: 500 });
         }
-      }
-    } else if (url.pathname.startsWith("/favicon.png")) {
-      try {
-        const object = await env.R2.get("favicon.png");
-        if (object === null) {
-          return new Response("favicon not found in R2", { status: 404 });
-        }
-        const headers = new Headers();
-        object.writeHttpMetadata(headers);
-        headers.set("etag", object.httpEtag);
-        headers.set("Content-Type", "image/png"); // Set the correct content type
-        return new Response(object.body, {
-          headers,
-        });
-      } catch (error) {
-        console.error("Error fetching favicon from R2:", error);
-        return new Response("Error fetching favicon", { status: 500 });
       }
     } else if (url.pathname.startsWith("/card/")) {
       const parts = url.pathname.split("/");
