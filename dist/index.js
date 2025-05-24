@@ -535,8 +535,10 @@ var form_default = `<!doctype html>
           0 4px 6px -1px rgba(0, 0, 0, 0.1),
           0 2px 4px -1px rgba(0, 0, 0, 0.06);
         padding: 2rem;
-        max-width: 70%; /* Slightly wider form */
+        max-width: 80%; /* Slightly wider form */
         width: 100%;
+        display: flex; /* Enable flexbox for columns */
+        align-items: flex-start; /* Align items to the start of the cross axis */
       }
 
       .form-title {
@@ -587,7 +589,7 @@ var form_default = `<!doctype html>
       }
 
       .submit-button {
-        background-color: #dc2626; /* Red submit button */
+        background-color: #6366f1; /* Indigo submit button */
         color: #f9fafb; /* Light gray text */
         font-weight: bold;
         padding: 0.75rem 1.5rem;
@@ -599,7 +601,7 @@ var form_default = `<!doctype html>
       }
 
       .submit-button:hover {
-        background-color: #b91c1c; /* Darker red on hover */
+        background-color: #4f46e5; /* Darker indigo on hover */
       }
     </style>
   </head>
@@ -610,13 +612,29 @@ var form_default = `<!doctype html>
       style="position: fixed; width: 100%; height: 100%; z-index: -1"
     ></div>
     <div class="bg-white rounded-lg shadow-md p-8 flex form-container">
-      <div class="w-1/3 pr-4">
-        <div class="mb-6 flex flex-col items-center">
+      <div class="mb-4 text-sm text-gray-600 text-center">
+        <p>
+          This site allows you to generate a rescue card containing important
+          medical and emergency contact information.
+        </p>
+        <p class="mt-2">
+          For enhanced security, the generated HTML file can be encrypted using
+          the PIN you provide. This PIN will be required to decrypt and view the
+          card.
+        </p>
+      </div>
+      <div class="w-1/3 pr-6 flex flex-col">
+        <div class="mb-8 flex flex-col items-center">
           <img
             src="https://assets.knightgil.com/logo.jpg"
             alt="logo"
             class="w-48 h-auto mb-4"
           />
+          <h2
+            class="form-title text-xl font-semibold text-gray-800 text-center"
+          >
+            Rescue Card Generator
+          </h2>
         </div>
         <div class="form-group mb-4">
           <label
@@ -634,7 +652,7 @@ var form_default = `<!doctype html>
             id="name"
             name="name"
             required
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             aria-describedby="name-error"
           />
           <p
@@ -660,7 +678,7 @@ var form_default = `<!doctype html>
             id="photo"
             name="photo"
             accept="image/*"
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             onchange="validateFileSize()"
           />
           <p
@@ -688,7 +706,7 @@ var form_default = `<!doctype html>
             minlength="4"
             maxlength="4"
             required
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             aria-describedby="pin-error"
           />
           <p
@@ -718,7 +736,7 @@ var form_default = `<!doctype html>
           <select
             id="bloodType"
             name="bloodType"
-            class="form-select shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-select rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           >
             <option value="">Select Blood Type</option>
             <option value="O+">O+</option>
@@ -746,7 +764,7 @@ var form_default = `<!doctype html>
             type="text"
             id="allergies"
             name="allergies"
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
         <div class="form-group mb-4">
@@ -764,7 +782,7 @@ var form_default = `<!doctype html>
             type="text"
             id="medications"
             name="medications"
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
         <div class="form-group mb-4">
@@ -778,12 +796,12 @@ var form_default = `<!doctype html>
               >Existing medical conditions.</span
             >
           </label>
-          <input
-            type="text"
+          <textarea
             id="medicalConditions"
             name="medicalConditions"
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
+            rows="3"
+            class="form-textarea rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          ></textarea>
         </div>
       </div>
 
@@ -806,7 +824,7 @@ var form_default = `<!doctype html>
             type="text"
             id="emergencyContactName"
             name="emergencyContactName"
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
         <div class="form-group mb-4">
@@ -824,7 +842,7 @@ var form_default = `<!doctype html>
             type="text"
             id="emergencyContactPhone"
             name="emergencyContactPhone"
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
         <div class="form-group mb-6">
@@ -842,7 +860,7 @@ var form_default = `<!doctype html>
             type="text"
             id="emergencyContactRelationship"
             name="emergencyContactRelationship"
-            class="form-input shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
         <div class="form-group mb-4">
@@ -860,186 +878,185 @@ var form_default = `<!doctype html>
             id="extraInformation"
             name="markdownContent"
             rows="3"
-            class="form-textarea shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="form-textarea rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           ></textarea>
         </div>
 
         <button
           type="submit"
-          class="submit-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          class="submit-button bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
         >
           Generate Rescue Card
         </button>
       </div>
     </div>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    const MAX_FILE_SIZE_MB = 1;
+    const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+    const fileInput = document.getElementById("photo");
+    const photoLabel = document.getElementById("photoLabel");
+    const fileSizeError = document.getElementById("fileSizeError");
+    const form = document.getElementById("generatorForm");
+    let isFileSizeErrorVisible = false; // Track if the error is currently visible
 
-    <script>
-      const MAX_FILE_SIZE_MB = 1;
-      const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
-      const fileInput = document.getElementById("photo");
-      const photoLabel = document.getElementById("photoLabel");
-      const fileSizeError = document.getElementById("fileSizeError");
-      const form = document.getElementById("generatorForm");
-      let isFileSizeErrorVisible = false; // Track if the error is currently visible
-
-      function validateFileSize() {
-        if (fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          if (file.size > MAX_FILE_SIZE_BYTES) {
-            fileSizeError.classList.remove("hidden");
-            fileInput.value = ""; // Clear the invalid file
-            triggerErrorFeedback();
-            isFileSizeErrorVisible = true;
-          } else {
-            fileSizeError.classList.add("hidden");
-            fileInput.classList.remove("error-flash");
-            isFileSizeErrorVisible = false;
-          }
+    function validateFileSize() {
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+          fileSizeError.classList.remove("hidden");
+          fileInput.value = ""; // Clear the invalid file
+          triggerErrorFeedback();
+          isFileSizeErrorVisible = true;
         } else {
+          fileSizeError.classList.add("hidden");
           fileInput.classList.remove("error-flash");
           isFileSizeErrorVisible = false;
         }
+      } else {
+        fileInput.classList.remove("error-flash");
+        isFileSizeErrorVisible = false;
       }
+    }
 
-      function triggerErrorFeedback() {
-        fileInput.classList.add("error-flash");
-        setTimeout(() => {
-          fileInput.classList.remove("error-flash");
-        }, 500); // Remove flash after 0.5 seconds
-        photoLabel.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the error
-      }
+    function triggerErrorFeedback() {
+      fileInput.classList.add("error-flash");
+      setTimeout(() => {
+        fileInput.classList.remove("error-flash");
+      }, 500); // Remove flash after 0.5 seconds
+      photoLabel.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the error
+    }
 
-      form.addEventListener("submit", function (event) {
-        if (fileInput.files.length > 0) {
-          const file = fileInput.files[0];
-          if (file.size > MAX_FILE_SIZE_BYTES) {
-            event.preventDefault(); // Prevent form submission
-            fileSizeError.classList.remove("hidden");
-            triggerErrorFeedback();
-            isFileSizeErrorVisible = true;
-          }
-        } else if (isFileSizeErrorVisible) {
-          // If there was a previous error and no file is selected, ensure error is visible and scroll
+    form.addEventListener("submit", function (event) {
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+          event.preventDefault(); // Prevent form submission
           fileSizeError.classList.remove("hidden");
           triggerErrorFeedback();
+          isFileSizeErrorVisible = true;
         }
-      });
-    </script>
-    <script>
-      particlesJS("particles-js", {
-        particles: {
-          number: {
-            value: 80,
-            density: {
-              enable: true,
-              value_area: 800,
-            },
-          },
-          color: {
-            value: ["#e60000", "#808080", "#404040"], // Vibrant red, medium gray, dark gray
-          },
-          shape: {
-            type: "circle",
-            stroke: {
-              width: 0,
-              color: "#000000",
-            },
-            polygon: {
-              nb_sides: 5,
-            },
-            image: {
-              src: "",
-              width: 100,
-              height: 100,
-            },
-          },
-          opacity: {
-            value: 0.5,
-            random: true,
-            anim: {
-              enable: false,
-              speed: 1,
-              opacity_min: 0.1,
-              sync: false,
-            },
-          },
-          size: {
-            value: 3,
-            random: true,
-            anim: {
-              enable: false,
-              speed: 40,
-              size_min: 0.1,
-              sync: false,
-            },
-          },
-          line_linked: {
+      } else if (isFileSizeErrorVisible) {
+        // If there was a previous error and no file is selected, ensure error is visible and scroll
+        fileSizeError.classList.remove("hidden");
+        triggerErrorFeedback();
+      }
+    });
+  </script>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: {
+          value: 80,
+          density: {
             enable: true,
-            distance: 150,
-            color: "#808080", // Medium gray lines
-            opacity: 0.4,
-            width: 1,
+            value_area: 800,
           },
-          move: {
-            enable: true,
-            speed: 2,
-            direction: "none",
-            random: true,
-            straight: false,
-            out_mode: "out",
-            bounce: false,
-            attract: {
-              enable: false,
-              rotateX: 600,
-              rotateY: 1200,
-            },
-          },
-          interactivity: {
-            detect_on: "canvas",
-            events: {
-              onhover: {
-                enable: false,
-                mode: "grab",
-              },
-              onclick: {
-                enable: false,
-                mode: "push",
-              },
-              resize: true,
-            },
-            modes: {
-              grab: {
-                distance: 140,
-                line_linked: {
-                  opacity: 1,
-                },
-              },
-              bubble: {
-                distance: 400,
-                size: 40,
-                duration: 2,
-                opacity_out: 0.8,
-                speed: 3,
-              },
-              repulse: {
-                distance: 200,
-                duration: 0.4,
-              },
-              push: {
-                particles_nb: 4,
-              },
-              remove: {
-                particles_nb: 2,
-              },
-            },
-          },
-          retina_detect: true,
         },
-      });
-    </script>
-  </body>
+        color: {
+          value: ["#e60000", "#808080", "#404040"], // Vibrant red, medium gray, dark gray
+        },
+        shape: {
+          type: "circle",
+          stroke: {
+            width: 0,
+            color: "#000000",
+          },
+          polygon: {
+            nb_sides: 5,
+          },
+          image: {
+            src: "",
+            width: 100,
+            height: 100,
+          },
+        },
+        opacity: {
+          value: 0.5,
+          random: true,
+          anim: {
+            enable: false,
+            speed: 1,
+            opacity_min: 0.1,
+            sync: false,
+          },
+        },
+        size: {
+          value: 3,
+          random: true,
+          anim: {
+            enable: false,
+            speed: 40,
+            size_min: 0.1,
+            sync: false,
+          },
+        },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#808080", // Medium gray lines
+          opacity: 0.4,
+          width: 1,
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: "none",
+          random: true,
+          straight: false,
+          out_mode: "out",
+          bounce: false,
+          attract: {
+            enable: false,
+            rotateX: 600,
+            rotateY: 1200,
+          },
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: {
+              enable: false,
+              mode: "grab",
+            },
+            onclick: {
+              enable: false,
+              mode: "push",
+            },
+            resize: true,
+          },
+          modes: {
+            grab: {
+              distance: 140,
+              line_linked: {
+                opacity: 1,
+              },
+            },
+            bubble: {
+              distance: 400,
+              size: 40,
+              duration: 2,
+              opacity_out: 0.8,
+              speed: 3,
+            },
+            repulse: {
+              distance: 200,
+              duration: 0.4,
+            },
+            push: {
+              particles_nb: 4,
+            },
+            remove: {
+              particles_nb: 2,
+            },
+          },
+        },
+        retina_detect: true,
+      },
+    });
+  </script>
 </html>
 `;
 
