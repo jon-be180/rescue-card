@@ -612,19 +612,8 @@ var form_default = `<!doctype html>
       style="position: fixed; width: 100%; height: 100%; z-index: -1"
     ></div>
     <div class="bg-white rounded-lg shadow-md p-8 flex form-container">
-      <div class="mb-4 text-sm text-gray-600 text-center">
-        <p>
-          This site allows you to generate a rescue card containing important
-          medical and emergency contact information.
-        </p>
-        <p class="mt-2">
-          For enhanced security, the generated HTML file can be encrypted using
-          the PIN you provide. This PIN will be required to decrypt and view the
-          card.
-        </p>
-      </div>
       <div class="w-1/3 pr-6 flex flex-col">
-        <div class="mb-8 flex flex-col items-center">
+        <div class="flex flex-col items-center">
           <img
             src="https://assets.knightgil.com/logo.jpg"
             alt="logo"
@@ -635,6 +624,14 @@ var form_default = `<!doctype html>
           >
             Rescue Card Generator
           </h2>
+          <div class="mb-4 text-sm text-gray-600 text-center">
+            <p>
+              For enhanced security, the generated HTML file can be encrypted
+              using the PIN you provide. This PIN will be required to decrypt
+              and view the card, not even the author can access the saved
+              information.
+            </p>
+          </div>
         </div>
         <div class="form-group mb-4">
           <label
@@ -802,6 +799,13 @@ var form_default = `<!doctype html>
             rows="3"
             class="form-textarea rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           ></textarea>
+        </div>
+
+        <div class="mb-4 text-sm text-gray-600 text-center">
+          <p>
+            This site allows you to generate a rescue card containing important
+            medical and emergency contact information.
+          </p>
         </div>
       </div>
 
