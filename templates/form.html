@@ -9,6 +9,10 @@
       rel="stylesheet"
     />
     <link
+      rel="stylesheet"
+      href="https://unpkg.com/easymde/dist/easymde.min.css"
+    />
+    <link
       rel="icon"
       href="https://assets.knightgil.com/favicon.png"
       type="image/png"
@@ -76,7 +80,7 @@
           0 4px 6px -1px rgba(0, 0, 0, 0.1),
           0 2px 4px -1px rgba(0, 0, 0, 0.06);
         padding: 2rem;
-        max-width: 80%; /* Slightly wider form */
+        max-width: 65%; /* Slightly wider form */
         width: 100%;
         display: flex; /* Enable flexbox for columns */
         align-items: flex-start; /* Align items to the start of the cross axis */
@@ -130,7 +134,6 @@
       }
 
       .submit-button {
-        background-color: #6366f1; /* Indigo submit button */
         color: #f9fafb; /* Light gray text */
         font-weight: bold;
         padding: 0.75rem 1.5rem;
@@ -140,10 +143,6 @@
         width: 100%;
         transition: background-color 0.15s ease-in-out;
       }
-
-      .submit-button:hover {
-        background-color: #4f46e5; /* Darker indigo on hover */
-      }
     </style>
   </head>
 
@@ -152,8 +151,10 @@
       id="particles-js"
       style="position: fixed; width: 100%; height: 100%; z-index: -1"
     ></div>
-    <div class="bg-white rounded-lg shadow-md p-8 flex form-container">
-      <div class="w-1/3 pr-6 flex flex-col">
+    <div
+      class="bg-white rounded-lg shadow-md p-8 flex flx-col md:flex-row form-container"
+    >
+      <div class="w-full md:w-1/2 md:pr-6 flex flex-col">
         <div class="flex flex-col items-center">
           <img
             src="https://assets.knightgil.com/logo.jpg"
@@ -165,14 +166,6 @@
           >
             Rescue Card Generator
           </h2>
-          <div class="mb-4 text-sm text-gray-600 text-center">
-            <p>
-              For enhanced security, the generated HTML file can be encrypted
-              using the PIN you provide. This PIN will be required to decrypt
-              and view the card, not even the author can access the saved
-              information.
-            </p>
-          </div>
         </div>
         <div class="form-group mb-4">
           <label
@@ -216,9 +209,31 @@
             id="photo"
             name="photo"
             accept="image/*"
-            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="hidden"
             onchange="validateFileSize()"
           />
+          <div
+            id="photoSelectionArea"
+            class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:border-blue-500 transition-colors duration-200"
+          >
+            <p id="photoInstructionText" class="text-gray-500">
+              Click here to upload a photo (desktop)
+            </p>
+            <img
+              id="photoPreview"
+              src=""
+              alt="Photo Preview"
+              class="mt-4 mx-auto max-w-full h-auto hidden rounded-md border border-gray-200"
+            />
+          </div>
+
+          <button
+            type="button"
+            id="cameraButton"
+            class="hidden mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Take a Photo
+          </button>
           <p
             id="fileSizeError"
             class="form-error text-red-500 text-xs italic hidden"
@@ -254,103 +269,16 @@
             Please enter a 4-digit PIN.
           </p>
         </div>
-      </div>
-
-      <div class="w-1/3 px-4">
-        <h2 class="form-title text-xl font-semibold text-gray-800 mb-4">
-          Medical Information
-        </h2>
-        <div class="form-group mb-4">
-          <label
-            for="bloodType"
-            class="form-label tooltip block text-gray-700 text-sm font-bold mb-2"
-          >
-            Blood Type:
-            <span
-              class="tooltiptext absolute left-0 -mt-10 w-32 bg-gray-800 text-white text-xs rounded py-1 px-2 z-10 opacity-0 transition-opacity duration-300"
-              >The person's blood type.</span
-            >
-          </label>
-          <select
-            id="bloodType"
-            name="bloodType"
-            class="form-select rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          >
-            <option value="">Select Blood Type</option>
-            <option value="O+">O+</option>
-            <option value="O-">O-</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-          </select>
-        </div>
-        <div class="form-group mb-4">
-          <label
-            for="allergies"
-            class="form-label tooltip block text-gray-700 text-sm font-bold mb-2"
-          >
-            Allergies:
-            <span
-              class="tooltiptext absolute left-0 -mt-8 w-32 bg-gray-800 text-white text-xs rounded py-1 px-2 z-10 opacity-0 transition-opacity duration-300"
-              >Any known allergies.</span
-            >
-          </label>
-          <input
-            type="text"
-            id="allergies"
-            name="allergies"
-            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div class="form-group mb-4">
-          <label
-            for="medications"
-            class="form-label tooltip block text-gray-700 text-sm font-bold mb-2"
-          >
-            Medications:
-            <span
-              class="tooltiptext absolute left-0 -mt-10 w-32 bg-gray-800 text-white text-xs rounded py-1 px-2 z-10 opacity-0 transition-opacity duration-300"
-              >Current medications.</span
-            >
-          </label>
-          <input
-            type="text"
-            id="medications"
-            name="medications"
-            class="form-input rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div class="form-group mb-4">
-          <label
-            for="medicalConditions"
-            class="form-label tooltip block text-gray-700 text-sm font-bold mb-2"
-          >
-            Medical Conditions:
-            <span
-              class="tooltiptext absolute left-0 -mt-12 w-48 bg-gray-800 text-white text-xs rounded py-1 px-2 z-10 opacity-0 transition-opacity duration-300"
-              >Existing medical conditions.</span
-            >
-          </label>
-          <textarea
-            id="medicalConditions"
-            name="medicalConditions"
-            rows="3"
-            class="form-textarea rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          ></textarea>
-        </div>
-
         <div class="mb-4 text-sm text-gray-600 text-center">
           <p>
-            This site allows you to generate a rescue card containing important
-            medical and emergency contact information.
+            Your rescue card is protected by End-to-End Encryption using the PIN
+            you provide. This PIN will be required to find, decrypt and display
+            the saved card.
           </p>
         </div>
       </div>
 
-      <div class="w-1/3 pl-4">
+      <div class="w-full md:w-1/2 md:pl-4">
         <h2 class="form-title text-xl font-semibold text-gray-800 mb-4">
           Emergency Contact Details
         </h2>
@@ -416,20 +344,21 @@
             Extra Information:
             <span
               class="tooltiptext absolute left-0 -mt-12 w-48 bg-gray-800 text-white text-xs rounded py-1 px-2 z-10 opacity-0 transition-opacity duration-300"
-              >Any additional information (Markdown accepted).</span
+              >Any additional information (Markdown accepted). Try to add social
+              media links or an address</span
             >
           </label>
           <textarea
             id="extraInformation"
             name="markdownContent"
-            rows="3"
+            rows="2"
             class="form-textarea rounded-md shadow appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           ></textarea>
         </div>
 
         <button
           type="submit"
-          class="submit-button bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          class="submit-button bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
         >
           Generate Rescue Card
         </button>
@@ -437,58 +366,144 @@
     </div>
   </body>
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-
+  <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
   <script>
-    const MAX_FILE_SIZE_MB = 1;
-    const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
-    const fileInput = document.getElementById("photo");
-    const photoLabel = document.getElementById("photoLabel");
-    const fileSizeError = document.getElementById("fileSizeError");
-    const form = document.getElementById("generatorForm");
-    let isFileSizeErrorVisible = false; // Track if the error is currently visible
+    // --- Photo Input & Camera Logic ---
+    const photoInput = document.getElementById("photo");
+    const photoSelectionArea = document.getElementById("photoSelectionArea");
+    const photoInstructionText = document.getElementById(
+      "photoInstructionText",
+    );
+    const photoPreview = document.getElementById("photoPreview");
+    const photoError = document.getElementById("photoError");
+    const cameraButton = document.getElementById("cameraButton");
 
-    function validateFileSize() {
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        if (file.size > MAX_FILE_SIZE_BYTES) {
-          fileSizeError.classList.remove("hidden");
-          fileInput.value = ""; // Clear the invalid file
-          triggerErrorFeedback();
-          isFileSizeErrorVisible = true;
-        } else {
-          fileSizeError.classList.add("hidden");
-          fileInput.classList.remove("error-flash");
-          isFileSizeErrorVisible = false;
-        }
+    const MAX_IMAGE_SIZE_KB = 1024; // 1MB for original file check (before resizing)
+    const MAX_IMAGE_WIDTH = 400; // Desired max width for the resized image
+    const MAX_IMAGE_HEIGHT = 400; // Desired max height, will maintain aspect ratio
+    const JPEG_QUALITY = 0.8; // Adjust for balance of quality vs file size (0.0 to 1.0)
+
+    let processedImageBase64 = ""; // Global variable to store the Base64 image data
+
+    // --- Event Listeners ---
+
+    // 1. Check if on a mobile device to show camera option
+    window.addEventListener("DOMContentLoaded", () => {
+      // Simple check for mobile device. More robust checks exist, but this is usually sufficient for 'capture' attribute.
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        photoInstructionText.textContent = "Click here to select a photo";
+        cameraButton.classList.remove("hidden");
+        // Set capture attribute for selfie on mobile input
+        photoInput.setAttribute("capture", "user");
       } else {
-        fileInput.classList.remove("error-flash");
-        isFileSizeErrorVisible = false;
-      }
-    }
-
-    function triggerErrorFeedback() {
-      fileInput.classList.add("error-flash");
-      setTimeout(() => {
-        fileInput.classList.remove("error-flash");
-      }, 500); // Remove flash after 0.5 seconds
-      photoLabel.scrollIntoView({ behavior: "smooth", block: "start" }); // Scroll to the error
-    }
-
-    form.addEventListener("submit", function (event) {
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        if (file.size > MAX_FILE_SIZE_BYTES) {
-          event.preventDefault(); // Prevent form submission
-          fileSizeError.classList.remove("hidden");
-          triggerErrorFeedback();
-          isFileSizeErrorVisible = true;
-        }
-      } else if (isFileSizeErrorVisible) {
-        // If there was a previous error and no file is selected, ensure error is visible and scroll
-        fileSizeError.classList.remove("hidden");
-        triggerErrorFeedback();
+        // For desktop, enable drag & drop
+        photoSelectionArea.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          photoSelectionArea.classList.add("border-blue-500", "bg-blue-50");
+        });
+        photoSelectionArea.addEventListener("dragleave", () => {
+          photoSelectionArea.classList.remove("border-blue-500", "bg-blue-50");
+        });
+        photoSelectionArea.addEventListener("drop", (e) => {
+          e.preventDefault();
+          photoSelectionArea.classList.remove("border-blue-500", "bg-blue-50");
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            processImageFile(files[0]);
+          }
+        });
       }
     });
+
+    // 2. Click handler for the custom photo selection area (for file upload)
+    photoSelectionArea.addEventListener("click", () => {
+      photoInput.click(); // Trigger the hidden file input
+    });
+
+    // 3. Click handler for the camera button (for mobile selfie)
+    cameraButton.addEventListener("click", () => {
+      // This essentially triggers the file input again, but with 'capture="user"' set
+      photoInput.click();
+    });
+
+    // 4. Handle file selection (from upload or camera capture)
+    function handleFileSelect(event) {
+      const files = event.target.files;
+      if (files.length > 0) {
+        processImageFile(files[0]);
+      }
+      // Clear the input so selecting the same file again triggers change event
+      event.target.value = "";
+    }
+
+    // --- Image Processing Logic ---
+    function processImageFile(file) {
+      photoError.classList.add("hidden"); // Hide any previous errors
+      processedImageBase64 = ""; // Clear previous image data
+      photoPreview.classList.add("hidden"); // Hide preview until new image loads
+
+      // 1. Basic file type and size check (before full processing)
+      if (!file.type.startsWith("image/")) {
+        photoError.textContent = "Please select an image file.";
+        photoError.classList.remove("hidden");
+        return;
+      }
+      if (file.size > MAX_IMAGE_SIZE_KB * 1024) {
+        // Convert KB to bytes
+        photoError.textContent = `File size exceeds ${MAX_IMAGE_SIZE_KB}KB. Please choose a smaller image.`;
+        photoError.classList.remove("hidden");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions while maintaining aspect ratio
+          // Only resize if the image is larger than our max dimensions
+          if (width > MAX_IMAGE_WIDTH || height > MAX_IMAGE_HEIGHT) {
+            if (width / MAX_IMAGE_WIDTH > height / MAX_IMAGE_HEIGHT) {
+              height *= MAX_IMAGE_WIDTH / width;
+              width = MAX_IMAGE_WIDTH;
+            } else {
+              width *= MAX_IMAGE_HEIGHT / height;
+              height = MAX_IMAGE_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert canvas content to Base64 (JPEG for better compression and transparency is not usually needed for profile photos)
+          processedImageBase64 = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+
+          // Update preview
+          photoPreview.src = processedImageBase64;
+          photoPreview.classList.remove("hidden");
+        };
+        img.onerror = function () {
+          photoError.textContent = "Could not load image. Please try another.";
+          photoError.classList.remove("hidden");
+          photoPreview.classList.add("hidden");
+        };
+        img.src = e.target.result; // Set src to the original Base64 to load into Image object
+      };
+      reader.onerror = function () {
+        photoError.textContent = "Error reading file. Please try again.";
+        photoError.classList.remove("hidden");
+        photoPreview.classList.add("hidden");
+      };
+      reader.readAsDataURL(file); // Start reading the file as Base64 Data URL
+    }
   </script>
   <script>
     particlesJS("particles-js", {
@@ -600,6 +615,35 @@
         },
         retina_detect: true,
       },
+    });
+  </script>
+  <script>
+    // --- EasyMDE Initialization ---
+    // Initialize EasyMDE on the textarea
+    const easyMDE = new EasyMDE({
+      element: document.getElementById("extraInformation"),
+      spellChecker: false, // You might want to enable this, depends on preference
+      // You can customize the toolbar here if you want specific buttons
+      toolbar: [
+        "bold",
+        "italic",
+        "heading",
+        "|",
+        "link",
+        "|",
+        "unordered-list",
+        "ordered-list",
+        "|",
+        "quote",
+        "|",
+        "preview",
+        "side-by-side",
+        "fullscreen",
+        "|",
+        "guide",
+      ],
+      status: false, // Hides the status bar (line, word, char count)
+      minHeight: "100px",
     });
   </script>
 </html>

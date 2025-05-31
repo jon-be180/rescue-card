@@ -4,5 +4,16 @@
   },
   "scripts": {
     "build": "esbuild ./src/index.js --bundle --outfile=./dist/index.js --platform=node --format=esm --loader:.html=text"
-  }
+  },
+  "name": "rescue-card",
+  "version": "1.0.0",
+  "description": "This project is designed to be hosted on Cloudflare Pages, using Wrangler",
+  "main": "index.js",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
